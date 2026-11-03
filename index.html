@@ -707,6 +707,14 @@ const JOIN_REQS = [
 const EXAMPLES = ['Sloan \'23','Product managers at Google','People from MIT working in healthcare','HBS alumni in New York','Founders in climate tech','People who worked at McKinsey'];
 const INCOMING_NOTES = {25:'Hi Noam! Saw you were at Monday.com before Sloan. I’m a Sloan ’24 at Apple and happy to help with your PM recruiting.',16:'Hey, fellow Waze/Monday alum network here. Would love to swap notes on NYC product roles.'};
 
+/* Placeholder portraits for the sample members, from randomuser.me (free stock photos made for mock users).
+   Member 0 is you, so it keeps your own photo. Remove these along with the sample members before launch. */
+const RU='https://randomuser.me/api/portraits/';
+const PHOTOS = {1:'women/44',2:'men/32',3:'women/68',4:'men/75',5:'women/65',6:'men/46',7:'women/21',8:'men/85',9:'men/22',10:'women/47',
+  11:'men/52',12:'men/61',13:'women/79',14:'men/11',15:'women/90',16:'men/36',17:'women/33',18:'men/4',19:'women/12',20:'men/18',
+  21:'men/67',22:'women/56',23:'men/41',24:'women/26',25:'men/29',26:'women/8',101:'women/37',102:'men/54'};
+const photoFor = id => PHOTOS[id] ? RU+PHOTOS[id]+'.jpg' : null;
+
 /* ---------- build people ---------- */
 const AREA = {'New York':'212','SF Bay Area':'415','Boston':'617','Seattle':'206'};
 const P = RAW.map(([id,name,role,company,location,industry,roleCat,status,schools,career,pref,hair])=>{
@@ -718,7 +726,7 @@ const P = RAW.map(([id,name,role,company,location,industry,roleCat,status,school
   const email = (first+'.'+last).toLowerCase().replace(/[^a-z.]/g,'')+'@'+SCHOOLS[sc[0].school].domain;
   const phone = `+1 (${AREA[location]}) 555-01${String(id).padStart(2,'0')}`;
   const blob = [name,role,company,...car.map(c=>c.role+' '+c.company)].join(' ').toLowerCase();
-  return {id,name,first,last,role,company,location,industry,roleCat,status,schools:sc,career:car,curCompany,prev,email,phone,pref,hair,words:blob.split(/[^a-z0-9]+/).filter(Boolean)};
+  return {id,name,first,last,role,company,location,industry,roleCat,status,schools:sc,career:car,curCompany,prev,email,phone,pref,hair,photo:photoFor(id),words:blob.split(/[^a-z0-9]+/).filter(Boolean)};
 });
 P.forEach(p=>{ p.verify = {school: p.id%2?'linkedin':'member', identity: p.id%3!==2, workplace: !!p.curCompany && p.id%4===1}; });
 EDGES.forEach(([a,b])=>{ [[a,b],[b,a]].forEach(([x,y])=>{ const px=P[x], py=P[y]; if(px.verify.school==='member' && px.verify.approver==null && py.schools.some(s=>px.schools.some(t=>t.school===s.school))) px.verify.approver=y; }); });
@@ -734,7 +742,7 @@ const S = {
   viewed:[8,22,14],
   interacted:[{id:1,label:'WhatsApp · 2d ago'},{id:4,label:'Connected · 5d ago'},{id:17,label:'Emailed · 1w ago'},{id:12,label:'Connected · 2w ago'},{id:7,label:'WhatsApp · 3w ago'}],
   query:'', filters:{}, sort:'relevance', showFilters:false, browse:null, netTab:'connections', recent:[], pill:null, draft:[], draftAll:null, connQ:'', connSort:'recent',
-  joinReqs: JOIN_REQS.slice(),
+  joinReqs: JOIN_REQS.map(r=>({...r,photo:photoFor(r.id)})),
   connOrder:[4,12,7,1,17,24], connAt:{4:'5 days ago',12:'2 weeks ago',7:'3 weeks ago',1:'2 months ago',17:'2 months ago',24:'2 months ago'},
 };
 
