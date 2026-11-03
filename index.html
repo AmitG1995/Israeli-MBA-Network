@@ -701,8 +701,8 @@ const EDGES = [[0,17],[0,24],[0,7],[0,1],[0,12],[0,4],
  [12,26],[12,17],[13,19],[13,21],[14,21],[14,15],[16,22],[16,19],[16,17],[17,24],[17,25],[18,19],[20,26],[23,24]];
 const ME = 0;
 const JOIN_REQS = [
-  {id:101,name:'Tal Ben-David',first:'Tal',last:'Ben-David',hair:'long',role:'Incoming PM',company:'Ramp',schools:[{school:'MIT Sloan',program:'MBA',year:2026}],li:{edu:'MIT Sloan · MBA, 2024–2026',id:false,israeli:'IDF · Intelligence Corps, Wix (Tel Aviv)'},knows:17,answer:'Grew up in Haifa. PM at Wix for 4 years before Sloan, now moving to NYC for a fintech role.',url:'linkedin.com/in/tal-bendavid',asked:'2 hours ago'},
-  {id:102,name:'Shai Mor',first:'Shai',last:'Mor',hair:'short',role:'MBA Candidate',company:'MIT Sloan',schools:[{school:'MIT Sloan',program:'MBA',year:2028}],li:{edu:null,id:true,israeli:'Technion, Intel (Haifa)'},knows:null,answer:'From Tel Aviv, ex-Intel engineer. Started at Sloan this fall and haven’t updated LinkedIn yet.',url:'linkedin.com/in/shaimor',asked:'Yesterday'},
+  {id:101,name:'Tal Ben-David',first:'Tal',last:'Ben-David',hair:'long',role:'Incoming PM',company:'Ramp',schools:[{school:'MIT Sloan',program:'MBA',year:2026}],li:{edu:'MIT Sloan · MBA, 2024–2026',id:false,israeli:'IDF · Intelligence Corps, Wix (Tel Aviv)'},knows:17,email:'tal.bendavid@example.com',answer:'Grew up in Haifa. PM at Wix for 4 years before Sloan, now moving to NYC for a fintech role.',url:'linkedin.com/in/tal-bendavid',asked:'2 hours ago'},
+  {id:102,name:'Shai Mor',first:'Shai',last:'Mor',hair:'short',role:'MBA Candidate',company:'MIT Sloan',schools:[{school:'MIT Sloan',program:'MBA',year:2028}],li:{edu:null,id:true,israeli:'Technion, Intel (Haifa)'},knows:null,email:'shai.mor@example.com',answer:'From Tel Aviv, ex-Intel engineer. Started at Sloan this fall and haven’t updated LinkedIn yet.',url:'linkedin.com/in/shaimor',asked:'Yesterday'},
 ];
 const EXAMPLES = ['Sloan \'23','Product managers at Google','People from MIT working in healthcare','HBS alumni in New York','Founders in climate tech','People who worked at McKinsey'];
 const INCOMING_NOTES = {25:'Hi Noam! Saw you were at Monday.com before Sloan. I’m a Sloan ’24 at Apple and happy to help with your PM recruiting.',16:'Hey, fellow Waze/Monday alum network here. Would love to swap notes on NYC product roles.'};
@@ -1001,7 +1001,7 @@ function rail(key){
 
 /* ---------- views ---------- */
 function topbar(){
-  if(S.view==='join') return `<header class="top"><div class="wrap"><span class="brand"><span class="brand-mark">${markSVG}</span><span class="full">Israeli MBA Network</span></span><span style="margin-left:auto"></span>${S.join&&S.join.step!=='done'?`<button class="btn sm ghost pill" data-act="join-exit">Exit preview</button>`:''}</div></header>`;
+  if(S.view==='join') return `<header class="top"><div class="wrap"><span class="brand"><span class="brand-mark">${markSVG}</span><span class="full">Israeli MBA Network</span></span><span style="margin-left:auto"></span>${S.join&&S.join.step!=='done'&&!S.firstRun?`<button class="btn sm ghost pill" data-act="join-exit">Exit preview</button>`:''}</div></header>`;
   const n = S.incoming.size + S.joinReqs.length;
   const tab = (v,label,ico)=>`<button class="${S.view===v?'on':''}" data-act="nav" data-view="${v}">${ico}<span>${label}</span>${v==='network'&&n?`<span class="badge">${n}</span>`:''}</button>`;
   const showSearch = S.view!=='home' && S.view!=='results';
@@ -1026,7 +1026,7 @@ function viewHome(){
       <div class="try"><span>Try:</span>${EXAMPLES.map(e=>`<button data-act="search" data-q="${esc(e)}">${esc(e)}</button>`).join('')}</div>
     </section>
     ${rail('interacted')}${rail('school')}${rail('pymk')}${rail('viewed')}${rail('industry')}
-    <p class="demo-note">Prototype with fictional members. Email and WhatsApp hand-offs are simulated. <button class="link" style="font-size:12px" data-act="join-start" data-mode="join">Preview the sign-up flow</button></p>
+    <p class="demo-note">Prototype with fictional members. Email and WhatsApp hand-offs are simulated. <button class="link" style="font-size:12px" data-act="reset-me">Start over as a new user</button></p>
   </div></main>`;
 }
 function browsePanel(tab){
@@ -1205,20 +1205,19 @@ function viewProfile(id){
           ${cg.length?`<div class="common">${cg.map(([ic,t])=>`<div><span class="ico">${ic}</span>${esc(t)}</div>`).join('')}</div>`:`<p class="muted" style="margin:0">Different paths, same community. Worth a hello.</p>`}</section>`}
       </div>
     </div>
-    ${isMe?`<p class="demo-note">Edits are saved in this browser only. <button class="link" style="font-size:12px" data-act="reset-me">Reset sample profile</button></p>`:''}
+    ${isMe?`<p class="demo-note">Edits are saved in this browser only. <button class="link" style="font-size:12px" data-act="reset-me">Start over as a new user</button></p>`:''}
   </div></main>`;
 }
 function viewNetwork(){
   const conns = [...adj.get(ME)].map(byId);
-  const tabs = [['connections','Connections',conns.length],['requests','Requests',S.incoming.size],['joinreqs','Join requests',S.joinReqs.length],['sent','Sent',S.pending.size]];
+  const tabs = [['connections','Connections',conns.length],['requests','Requests',S.incoming.size],['joinreqs','Admin: join requests',S.joinReqs.length],['sent','Sent',S.pending.size]];
   let body='';
   if(S.netTab==='connections') body = connBox(ME,'all',true);
   if(S.netTab==='requests') body = S.incoming.size?`<div class="rlist">${[...S.incoming].map(id=>{const p=byId(id);return `<div class="req">${av(p,52)}<button class="who" data-act="profile" data-id="${id}"><b>${esc(p.name)}</b> ${badges(p)}<div class="muted" style="font-size:13.5px">${esc(p.role)} · ${esc(p.company)}</div></button>
       <button class="btn ghost sm" data-act="decline" data-id="${id}">Ignore</button><button class="btn primary sm" data-act="accept" data-id="${id}">${I.check}Accept</button>
       ${INCOMING_NOTES[id]?`<p class="note">“${esc(INCOMING_NOTES[id])}”</p>`:''}</div>`}).join('')}</div>`:`<div class="empty-rail">No pending requests. You’re all caught up.</div>`;
   if(S.netTab==='joinreqs'){
-    const sch=me().schools[0]; const tag=SCHOOLS[sch.school].tag;
-    body = `<p class="muted" style="margin:-6px 0 14px;font-size:14px">People asking to join as ${esc(tag)} students or alumni. Approve someone only if you’re confident they’re Israeli and studied at ${esc(tag)}. If an approved member is later removed, their approver is flagged.</p>`
+    body = `<div class="notice" style="margin:-6px 0 14px">${I.shield}<span><b>Admins only.</b> Every new member is approved here by hand. Approve someone only if you’re confident they’re Israeli and studied where they say. Approving sends them their official welcome email. In the live app, each new request also arrives in the admin’s inbox with an Approve link.</span></div>`
       + (S.joinReqs.length?`<div class="rlist">${S.joinReqs.map(r=>{ const k=r.knows!=null?byId(r.knows):null; return `<div class="jr">
         <div class="jr-top">${av(r,52)}<span class="who"><b>${esc(r.name)}</b> ${badges(r,'md')}<div class="muted" style="font-size:13.5px">${esc(r.role)} · ${esc(r.company)} · asked ${esc(r.asked)}</div></span></div>
         <div class="ev"><span class="evc ${r.li.edu?'ok':'no'}">${r.li.edu?I.check:I.x}${r.li.edu?'LinkedIn: '+esc(r.li.edu):'School not listed on LinkedIn'}</span>
@@ -1226,7 +1225,7 @@ function viewNetwork(){
           <span class="evc ok">${I.check}Israeli background: ${esc(r.li.israeli)}</span>
           ${k?`<span class="evc ok">${I.users}Says ${esc(k.first)} can confirm${adj.get(ME).has(k.id)?' (your connection)':''}</span>`:''}</div>
         <div class="qa"><span>Where in Israel are you from, and what did you do before your MBA?</span>${esc(r.answer)}</div>
-        <div class="jr-acts"><button class="btn sm primary pill" data-act="jr-approve" data-id="${r.id}">${I.check}Approve</button><button class="btn sm ghost pill" data-act="jr-skip" data-id="${r.id}">I don’t know them</button><button class="btn sm danger" data-act="jr-decline" data-id="${r.id}">Decline</button><span class="sp" style="flex:1"></span><span class="link" style="font-size:13px;font-weight:500">${esc(r.url)}</span></div>
+        <div class="jr-acts"><button class="btn sm primary pill" data-act="jr-approve" data-id="${r.id}">${I.check}Approve</button><button class="btn sm danger" data-act="jr-decline" data-id="${r.id}">Decline</button><span class="sp" style="flex:1"></span><span class="link" style="font-size:13px;font-weight:500">${esc(r.url)}</span></div>
       </div>`; }).join('')}</div>`:`<div class="empty-rail">No one is waiting. You’re all caught up.</div>`);
   }
   if(S.netTab==='sent') body = S.pending.size?`<div class="rlist">${[...S.pending].map(id=>{const p=byId(id);return `<div class="req">${av(p,52)}<button class="who" data-act="profile" data-id="${id}"><b>${esc(p.name)}</b> ${badges(p)}<div class="muted" style="font-size:13.5px">${esc(p.role)} · ${esc(p.company)}</div></button>
@@ -1383,8 +1382,7 @@ function sendRequest(id){
 
 /* ---------- profile editing (LinkedIn-style) ---------- */
 const STORE_KEY='imn-my-profile-v1';
-const ME_FIELDS=['first','last','role','location','industry','schools','career','email','phone','pref','photo','about','verify'];
-const ME_DEFAULT = JSON.parse(JSON.stringify(Object.fromEntries(ME_FIELDS.map(k=>[k,P[ME][k]]))));
+const ME_FIELDS=['first','last','role','location','industry','schools','career','email','phone','pref','photo','about','verify','reqId'];
 const LOC_OPTIONS=['Boston','New York','SF Bay Area','Seattle','Los Angeles','Chicago','Washington, DC','Austin','Miami'];
 const PROGRAMS=['MBA','EMBA','Sloan Fellows MBA','Part-time MBA','MBA/MS'];
 const ySpan = y=>{const m=String(y).split('–'),st=+m[0],en=m[1]?(m[1]==='Present'?null:+m[1]):st; return [st,en]};
@@ -1401,7 +1399,7 @@ function recompute(p){
   p.words=[p.name,p.role,p.company,...p.career.map(c=>c.role+' '+c.company)].join(' ').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
 }
 function saveMe(){ try{ localStorage.setItem(STORE_KEY,JSON.stringify(Object.fromEntries(ME_FIELDS.map(k=>[k,me()[k]])))); }catch(_){ } }
-function loadMe(){ try{ const d=JSON.parse(localStorage.getItem(STORE_KEY)||'null'); if(d&&d.schools&&d.schools.length){ Object.assign(me(),d); recompute(me()); } }catch(_){ } }
+function loadMe(){ try{ const d=JSON.parse(localStorage.getItem(STORE_KEY)||'null'); if(d&&d.schools&&d.schools.length){ Object.assign(me(),d); recompute(me()); return true; } }catch(_){ } return false; }
 function strengthPanel(p){
   const items=[['photo','Add a profile photo',!!p.photo],['intro','Write a headline that says what you do',!!p.role&&p.role!=='MBA Candidate'],['about','Write an About section',!!(p.about&&p.about.trim())],['exp','Add your experience',p.career.length>0],['contact','Add your WhatsApp number',!!p.phone]];
   const done=items.filter(i=>i[2]).length; const lvl=done===items.length?'All-star':done>=3?'Intermediate':'Beginner';
@@ -1532,60 +1530,161 @@ function verifyBadges(p){
   else if(v.school==='email') out+=`<span class="vbadge">${I.shield}Verified · ${esc(sch)} email</span>`;
   else if(v.school==='vouch') out+=`<span class="vbadge">${I.shield}Vouched by a ${esc(sch)} member</span>`;
   else if(v.school==='admin') out+=`<span class="vbadge">${I.shield}Verified by admin</span>`;
-  else out+=`<span class="vbadge pend">${I.clock}School verification pending</span>`;
+  else out+=`<span class="vbadge pend">${I.clock}Awaiting admin approval</span>`;
   if(v.identity) out+=`<span class="vbadge idv">${I.user}ID verified on LinkedIn</span>`;
   if(v.workplace) out+=`<span class="vbadge idv">${I.building}Workplace verified</span>`;
   return out;
 }
-const SCHOOL_DOMAINS = {
-  'MIT Sloan':['mit.edu'], 'Harvard Business School':['hbs.edu','harvard.edu'], 'Stanford GSB':['stanford.edu'],
-  'Wharton':['upenn.edu'], 'Columbia Business School':['columbia.edu'], 'Kellogg':['northwestern.edu'],
-};
-/* What the real integration would return. OIDC = Sign In with LinkedIn; VOL = Verified on LinkedIn (Plus tier adds current job + recent education). */
-const LI_MOCK = {
-  oidc:{first:'Noam',last:'Levi',email:'noam.levi@gmail.com',photo:false},
-  vol:{identity:true,workplace:false,current:{role:'MBA Candidate',company:'MIT Sloan School of Management'},education:{school:'MIT Sloan',program:'MBA',year:2027,start:2025}},
-  pdf:[{years:'2021–2025',company:'Monday.com',role:'Product Manager',location:'Tel Aviv, Israel'},{years:'2018–2021',company:'Fiverr',role:'Business Analyst',location:'Tel Aviv, Israel'},{years:'2014–2018',company:'IDF · Unit 8200',role:'Team Lead',location:'Israel'}],
-};
-const JOIN_STEPS=[['connect','Connect LinkedIn'],['review','Review profile'],['verify','Get approved'],['done','Done']];
+/* The real "Sign in with LinkedIn" (OpenID Connect) only returns name, email and photo, and needs a backend.
+   Sign-up simulates the sign-in and reads everything else from the member's own LinkedIn profile PDF.
+   Log in uses the real thing: LinkedIn confirms the member's email and the backend matches it to an approved request. */
+/* Sign-up backend: the Google Apps Script web app URL (see backend/README.md). Empty = demo mode, nothing is sent. */
+const BACKEND_URL='https://script.google.com/macros/s/AKfycbwwRILZLmGF77kaMp61jlNGAdDStwuD0Mai5XagkUGsbE3tHNpw2ZbKNZ2D6OANfp0/exec';
+/* Client ID of the LinkedIn developer app (public; the secret lives only in the backend). Empty = LinkedIn login is off. */
+const LINKEDIN_CLIENT_ID='';
+const LI_STATE_KEY='imn-li-state';
+const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+let pdfjsReady=null;
+function loadPdfJs(){
+  if(!pdfjsReady) pdfjsReady=new Promise((res,rej)=>{ const sc=document.createElement('script'); sc.src=PDFJS+'pdf.min.js';
+    sc.onload=()=>{ pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+'pdf.worker.min.js'; res(pdfjsLib); }; sc.onerror=()=>{ pdfjsReady=null; rej(new Error('pdf.js failed to load')); }; document.head.appendChild(sc); });
+  return pdfjsReady;
+}
+const deEnt=t=>t.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;|&apos;/g,"'").replace(/&quot;/g,'"').replace(/\s+/g,' ').trim();
+const MONTH_YR=/^(?:[A-Za-z]+ )?(\d{4}) ?- ?(?:(?:[A-Za-z]+ )?(\d{4})|Present)/;
+/* LinkedIn's "Save to PDF" layout: a sidebar (contact, skills) and a main column with name, headline, location,
+   then sections (Summary, Experience, Education) whose titles use a larger font. In Experience the company line is
+   the largest body text, then the job title, then smaller date, location and description lines. */
+async function parseLinkedInPdf(file){
+  const lib=await loadPdfJs();
+  const doc=await lib.getDocument({data:await file.arrayBuffer()}).promise;
+  const side=[], main=[];
+  for(let i=1;i<=doc.numPages;i++){
+    const pg=await doc.getPage(i), w=pg.getViewport({scale:1}).width, tc=await pg.getTextContent(), rows=new Map();
+    tc.items.forEach(it=>{ if(!it.str.trim()) return; const x=it.transform[4], y=Math.round(it.transform[5]), h=Math.abs(it.transform[3]);
+      const k=(x<w*.33?'L':'R')+y; const r=rows.get(k)||{side:x<w*.33,y,h:0,t:''}; r.t+=it.str; r.h=Math.max(r.h,h); rows.set(k,r); });
+    [...rows.values()].sort((a,b)=>b.y-a.y).forEach(r=>{ r.t=deEnt(r.t); r.page=i; if(/^Page ?\d+ ?of ?\d+$/i.test(r.t)) return; (r.side?side:main).push(r); });
+  }
+  const out={first:'',last:'',headline:'',location:'',email:'',url:'',about:'',career:[],education:[]};
+  const sideTxt=side.map(r=>r.t).join(' ');
+  out.email=(sideTxt.match(/[\w.+-]+@[\w-]+\.[\w.-]+/)||[''])[0];
+  out.url=((sideTxt.match(/(?:www\.)?linkedin\.com\/in\/[\w%-]+/i)||[''])[0]).replace(/^www\./,'');
+  if(!main.length) throw new Error('no text');
+  const nameRow=main.reduce((a,b)=>b.h>a.h?b:a);
+  const secH=Math.max(...main.filter(r=>r!==nameRow).map(r=>r.h));
+  const isHead=r=>r!==nameRow && r.h>=secH-.5;
+  const ni=main.indexOf(nameRow); const [first,...rest]=nameRow.t.split(' '); out.first=first; out.last=rest.join(' ');
+  const top=[]; for(let i=ni+1;i<main.length&&!isHead(main[i]);i++) top.push(main[i].t);
+  if(top.length>1) out.location=top.pop(); out.headline=top.join(' ');
+  const sec={}; let cur=null; main.slice(ni+1).forEach(r=>{ if(isHead(r)){ cur=r.t.toLowerCase(); sec[cur]=[]; } else if(cur) sec[cur].push(r); });
+  if(sec.summary) out.about=sec.summary.map(r=>r.t).join(' ');
+  const ex=sec.experience||[];
+  if(ex.length){
+    const sizes=[...new Set(ex.map(r=>Math.round(r.h*2)/2))].sort((a,b)=>b-a);
+    const coH=sizes[0], tiH=sizes.length>2?sizes[1]:null; let company='';
+    ex.forEach((r,i)=>{ const h=Math.round(r.h*2)/2;
+      if(h===coH && tiH!==null){ company=r.t; return; }
+      const m=r.t.match(MONTH_YR); if(!m) return;
+      const prev=ex[i-1]; if(!prev) return;
+      const role = tiH===null||Math.round(prev.h*2)/2===tiH ? prev.t : '';
+      if(tiH===null && ex[i-2]) company=ex[i-2].t;
+      const nx=ex[i+1]; const loc = nx && nx.page===r.page && r.y-nx.y<=17 && !MONTH_YR.test(nx.t) && nx.t.length<70 && Math.round(nx.h*2)/2!==coH ? nx.t : '';
+      out.career.push({company, role, years:fmtYears(+m[1], /Present/.test(r.t.slice(0,40))&&!m[2]?null:+(m[2]||m[1])), location:loc});
+    });
+  }
+  const ed=sec.education||[];
+  ed.forEach((r,i)=>{ const m=r.t.match(/^(.*?)\s*·\s*\((?:[A-Za-z]+ )?(\d{4})\s*-\s*(?:[A-Za-z]+ )?(\d{4})\)/); if(!m||!ed[i-1]) return;
+    out.education.push({school:ed[i-1].t, degree:m[1].trim(), start:+m[2], end:+m[3]}); });
+  return out;
+}
+function matchSchool(name){
+  const n=name.toLowerCase();
+  return Object.keys(SCHOOLS).find(k=>n.includes(SCHOOLS[k].full.toLowerCase())||n.includes(k.toLowerCase()))
+    || Object.keys(SCHOOLS).find(k=>SCHOOLS[k].aliases.some(a=>new RegExp('\\b'+a+'\\b').test(n)));
+}
+function matchLocation(loc){
+  const l=(loc||'').toLowerCase();
+  const map=[['Boston',/boston|cambridge|massachusetts/],['New York',/new york|nyc|brooklyn/],['SF Bay Area',/san francisco|bay area|palo alto|menlo park|mountain view|san jose|oakland/],['Seattle',/seattle|redmond|bellevue/],['Los Angeles',/los angeles/],['Chicago',/chicago|evanston/],['Washington, DC',/washington/],['Austin',/austin/],['Miami',/miami/]];
+  return (map.find(([,re])=>re.test(l))||[])[0]||null;
+}
+const JOIN_STEPS=[['connect','Sign up'],['review','Review profile'],['verify','Admin approval'],['done','Done']];
+/* Registration email sent to an applicant once an admin approves them. In the live app the server sends it. */
+function regEmail(first,email){
+  return {to:email, subject:'You’re approved: welcome to Israeli MBA Network',
+    body:`Hi ${first},\n\nGood news: an admin reviewed your request and approved you. Your registration is complete and your profile is now live in the network.\n\nWhat you can do now:\n• Search for Israeli MBAs by school, company or industry\n• Connect with members and ask for warm intros\n• Keep your profile current with “Update from LinkedIn”\n\nLog in on any device with “Log in” and this email address.\n\nWelcome aboard,\nThe Israeli MBA Network team`};
+}
+function openRegEmail(first,email,note){
+  const m=regEmail(first,email);
+  openModal(`<h3 style="display:flex;gap:8px;align-items:center"><span style="color:var(--accent)">${I.mail.replace('<svg','<svg width="22" height="22"')}</span>Registration email sent</h3>
+    <p class="sub">${note}</p>
+    <dl class="kv"><dt>To</dt><dd style="grid-column:span 2">${esc(m.to)}</dd><dt>Subject</dt><dd style="grid-column:span 2">${esc(m.subject)}</dd></dl>
+    <div class="mail-body">${esc(m.body)}</div>
+    <div class="row"><button class="btn primary" data-act="close">Done</button></div>`);
+}
 function joinStart(mode){
   const m=me();
-  S.join={mode, step: mode==='sync'?'connecting':'welcome', pdf:'none', email:'', sent:false, code:'', err:'', alt:null,
-    draft:{first:'',last:'',role:'',location:m.location,industry:m.industry,phone:'',pref:'whatsapp',schools:[],career:[],src:{}}};
+  S.join={mode, step: mode==='sync'?'connecting':'welcome', pdf:'none', pdfErr:'', found:null,
+    draft: mode==='sync'
+      ? {first:m.first,last:m.last,role:m.role,email:m.email,location:m.location,industry:m.industry,phone:m.phone,pref:m.pref,about:m.about,schools:m.schools.map(x=>({...x})),career:m.career.map(c=>({...c,src:'you'})),src:{}}
+      : {first:'',last:'',role:'',email:'',location:'Boston',industry:Object.keys(INDUSTRIES)[0],phone:'',pref:'whatsapp',about:'',schools:[],career:[],src:{}}};
   go('join');
   if(mode==='sync') joinConnect();
 }
 function joinConnect(){
   S.join.step='connecting'; render();
-  setTimeout(()=>{ if(!S.join||S.join.step!=='connecting') return;
-    const d=S.join.draft, li=LI_MOCK;
-    Object.assign(d,{first:li.oidc.first,last:li.oidc.last,role:`${li.vol.current.role}`});
-    d.schools=[{...li.vol.education}]; d.src={name:'li',edu:'li',role:'li'};
-    if(S.join.mode==='sync'){ d.career=me().career.map(c=>({...c,src:'you'})); d.phone=me().phone; d.pref=me().pref; d.location=me().location; d.industry=me().industry; d.about=me().about; }
-    S.join.step='imported'; render();
-  },1500);
+  setTimeout(()=>{ if(!S.join||S.join.step!=='connecting') return; S.join.step='imported'; render(); },1200);
 }
-function joinPdf(){
-  S.join.pdf='reading'; render();
-  setTimeout(()=>{ if(!S.join) return; const d=S.join.draft;
-    LI_MOCK.pdf.forEach(c=>{ if(!d.career.some(x=>x.company===c.company&&x.years===c.years)) d.career.push({...c,src:'pdf'}); });
-    S.join.pdf='done'; render(); },1700);
+async function joinPdf(file){
+  const J=S.join; J.pdf='reading'; J.pdfErr=''; render();
+  try{
+    const r=await parseLinkedInPdf(file); if(!S.join) return;
+    if(!r.first||(!r.career.length&&!r.education.length)) throw new Error('not a LinkedIn profile');
+    const d=J.draft;
+    Object.assign(d,{first:r.first,last:r.last,role:r.headline||d.role,email:r.email||d.email,about:r.about||d.about});
+    const loc=matchLocation(r.location)||matchLocation(r.career[0]?.location); if(loc) d.location=loc;
+    J.liurl=r.url;
+    r.career.forEach(c=>{ if(!d.career.some(x=>x.company===c.company&&x.years===c.years)) d.career.push({...c,src:'pdf'}); });
+    const mba=r.education.find(e=>matchSchool(e.school)&&/mba|business administration/i.test(e.degree))||r.education.find(e=>matchSchool(e.school));
+    if(mba) d.schools=[{school:matchSchool(mba.school),program:'MBA',year:mba.end,start:mba.start}];
+    d.src={name:'pdf',edu:mba?'pdf':'',role:'pdf'};
+    J.found={...r,mba:mba?matchSchool(mba.school):null,locMapped:loc};
+    J.pdf='done';
+  }catch(err){ J.pdf='none'; J.pdfErr='We couldn’t read that file. Use the PDF from your LinkedIn profile: More → Save to PDF.'; }
+  render();
 }
 function stepIdx(st){ return st==='welcome'||st==='connecting'||st==='imported'?0: st==='review'?1: st==='verify'?2:3; }
 function viewJoin(){
   const J=S.join; if(!J) return '';
   const cur=stepIdx(J.step);
   const steps = J.mode==='sync' ? JOIN_STEPS.slice(0,2) : JOIN_STEPS;
-  const head=`<ol class="steps">${steps.map(([k,l],i)=>`<li class="${i===cur?'on':i<cur?'done':''}">${l}</li>`).join('')}</ol>`;
+  const head=J.step==='login'?'':`<ol class="steps">${steps.map(([k,l],i)=>`<li class="${i===cur?'on':i<cur?'done':''}">${l}</li>`).join('')}</ol>`;
   const d=J.draft; let body='';
   if(J.step==='welcome'){
-    const v=byId(1);
     body=`<div class="jcard">
-      <div class="invite">${av(v,44)}<span><b>${esc(v.name)} vouched for you</b><small>${esc(schoolTag(v.schools[0]))} · ${esc(v.role)} at ${esc(v.company)}</small></span></div>
       <h1>Join the network of Israeli MBAs in the US</h1>
-      <p class="lead">Connect LinkedIn to fill in your profile in about a minute. Then confirm your school with your school email.</p>
-      <div class="row"><button class="btn lg li pill" data-act="join-connect">${I.link}Continue with LinkedIn</button><button class="btn lg ghost pill" data-act="join-manual">Fill in manually</button></div>
-      <p class="fine">We import your name, photo, email, current role and most recent school. We never post for you, and we don’t read your messages or LinkedIn connections. You can edit everything before it goes live.</p>
+      <p class="lead">Connect LinkedIn and we fill in your profile for you, or sign up with email and fill it in yourself. An admin reviews every request, and we email you as soon as you’re approved.</p>
+      <div class="row"><button class="btn lg li pill" data-act="join-connect">${I.link}Continue with LinkedIn</button><button class="btn lg ghost pill" data-act="join-manual">${I.mail}Sign up with email</button></div>
+      <p class="fine" style="font-size:14px;color:var(--muted)">Already a member? <button class="link" data-act="join-login">Log in</button></p>
+      <p class="fine">We import your name, photo, email, current role and most recent school. We never post for you, and we don’t read your messages or LinkedIn connections. You can edit everything before you submit.</p>
+    </div>`;
+  }
+  if(J.step==='login'){
+    const L=J.login||{};
+    body=`<div class="jcard">
+      <h1>Log in</h1>
+      ${L.liBusy?`<p class="lead">Checking your LinkedIn account…</p>`
+      :!L.emailMode?`<p class="lead">Log in with the LinkedIn account that uses the email you signed up with.</p>
+        ${L.err?`<div class="notice" style="background:var(--warm-soft);color:var(--warm);margin-bottom:14px">${I.x}<span>${L.err}</span></div>`:''}
+        <div class="row"><button class="btn lg li pill" data-act="login-li">${I.link}Log in with LinkedIn</button><button class="link" data-act="join-go" data-step="welcome">Back</button></div>
+        <p class="fine" style="font-size:14px;color:var(--muted)">LinkedIn uses a different email? <button class="link" data-act="login-email-mode">Get a code by email instead</button></p>`
+      :!L.sent?`<p class="lead">Enter the email you signed up with. We’ll email you a 6-digit code.</p>
+        ${L.err?`<div class="notice" style="background:var(--warm-soft);color:var(--warm);margin-bottom:14px">${I.x}<span>${L.err}</span></div>`:''}
+        <div class="jsec">${fld('l-email','Email',`<input type="email" id="l-email" value="${esc(L.email||'')}" placeholder="you@example.com" autocomplete="email">`)}</div>
+        <div class="row"><button class="btn lg primary pill" data-act="login-send" ${L.busy?'disabled':''}>${L.busy?'Sending…':'Email me a code'}</button><button class="link" data-act="login-li-mode">Back</button></div>`
+      :`<p class="lead">We sent a code to <b>${esc(L.email)}</b>. It expires in 10 minutes.</p>
+        ${L.err?`<div class="notice" style="background:var(--warm-soft);color:var(--warm);margin-bottom:14px">${I.x}<span>${L.err}</span></div>`:''}
+        <div class="jsec">${fld('l-code','Code',`<input type="text" id="l-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456">`)}</div>
+        <div class="row"><button class="btn lg primary pill" data-act="login-verify" ${L.busy?'disabled':''}>${L.busy?'Checking…':'Log in'}</button><button class="link" data-act="login-restart">Use a different email</button></div>`}
     </div>`;
   }
   if(J.step==='connecting'){
@@ -1593,26 +1692,25 @@ function viewJoin(){
       <span class="muted" style="font-size:13.5px;max-width:44ch">In the live app, LinkedIn’s own sign-in window opens here and asks you to approve sharing. This preview skips that step.</span></div></div>`;
   }
   if(J.step==='imported'){
-    const e=d.schools[0];
+    const f=J.found, sync=J.mode==='sync';
+    const row=(k,v,ok)=>`<li><span class="k">${k}</span><span class="v">${v||'<span class="muted" style="font-weight:400">Not found, add it next</span>'}</span>${ok&&v?`<span class="ok">${I.check}</span>`:''}</li>`;
     body=`<div class="jcard">
-      <h1>${J.mode==='sync'?'Here’s what LinkedIn has now':'LinkedIn shared your basics'}</h1>
-      <p class="lead">Check these, then add the rest of your career path.</p>
-      <ul class="gotlist">
-        <li><span class="k">Name</span><span class="v">${esc(d.first+' '+d.last)}</span><span class="ok">${I.check}</span></li>
-        <li><span class="k">Email</span><span class="v">${esc(LI_MOCK.oidc.email)}</span><span class="ok">${I.check}</span></li>
-        <li><span class="k">Identity</span><span class="v">${LI_MOCK.vol.identity?'Verified with government ID on LinkedIn':'Not verified on LinkedIn'}</span><span class="ok">${LI_MOCK.vol.identity?I.check:''}</span></li>
-        <li><span class="k">Current role</span><span class="v">${esc(LI_MOCK.vol.current.role)} · ${esc(LI_MOCK.vol.current.company)}</span><span class="ok">${I.check}</span></li>
-        <li><span class="k">Recent education</span><span class="v">${classBadge(e)} ${esc(SCHOOLS[e.school].full)}</span><span class="src">CHECK IN STEP 3</span></li>
-      </ul>
-      <div class="drop">
+      <h1>${sync?'Update from your LinkedIn PDF':'You’re signed in with LinkedIn'}</h1>
+      <p class="lead">${sync?'Upload a fresh copy of your LinkedIn PDF and we’ll add anything new.':'Now upload your LinkedIn profile PDF and we’ll fill in your whole profile: name, email, headline, location, MBA and career history.'}</p>
+      ${J.pdf==='done'?`<ul class="gotlist">
+        ${row('Name',esc(d.first+' '+d.last),1)}${row('Email',esc(d.email),1)}${row('Headline',esc(d.role),1)}
+        ${row('Location',f.location?esc(f.location)+(f.locMapped&&f.locMapped!==f.location?` <span class="muted" style="font-weight:400">→ ${esc(f.locMapped)}</span>`:''):'',1)}
+        ${row('MBA',d.schools[0]&&f.mba?`${classBadge(d.schools[0])} ${esc(SCHOOLS[d.schools[0].school].full)}`:'',1)}
+        ${row('Career',f.career.length?`${f.career.length} position${f.career.length>1?'s':''}`:'',1)}
+        ${row('About',f.about?'Imported from your summary':'',1)}
+      </ul>`:`<div class="drop" style="margin-top:0">
         <span class="ico">${I.doc}</span>
-        <span class="t"><b>Add your full career path</b><small>LinkedIn only shares your current job. On your LinkedIn profile, click <b>More → Save to PDF</b>, then upload it here.</small>
+        <span class="t"><b>Add your LinkedIn profile PDF</b><small>On your LinkedIn profile, click <b>More → Save to PDF</b>. Then upload the file here. It’s read in your browser and never uploaded.</small>
           ${J.pdf==='reading'?'<div class="progress"><i></i></div><small>Reading your profile…</small>':''}
-          ${J.pdf==='done'?`<small style="color:var(--ok);font-weight:600">Found ${LI_MOCK.pdf.length} positions. Review them next.</small>`:''}</span>
-        ${J.pdf==='none'?`<span class="btn ghost pill upload">${I.doc}Upload PDF<input type="file" id="li-pdf" accept="application/pdf,.pdf" aria-label="Upload LinkedIn profile PDF"></span>`:''}
-      </div>
-      <p class="fine">Preview only: the file isn’t read here and sample positions are used.</p>
-      <div class="row"><button class="btn lg primary pill" data-act="join-go" data-step="review" ${J.pdf==='reading'?'disabled':''}>Review profile</button>${J.pdf==='none'?'<button class="link" data-act="join-go" data-step="review">Skip, I’ll add jobs later</button>':''}</div>
+          ${J.pdfErr?`<small style="color:#C2362F;font-weight:600;display:block;margin-top:6px">${esc(J.pdfErr)}</small>`:''}</span>
+        ${J.pdf==='none'?`<span class="btn primary pill upload">${I.doc}Upload PDF<input type="file" id="li-pdf" accept="application/pdf,.pdf" aria-label="Upload LinkedIn profile PDF"></span>`:''}
+      </div>`}
+      <div class="row">${J.pdf==='done'?`<button class="btn lg primary pill" data-act="join-go" data-step="review">Review profile</button><button class="link" data-act="join-pdf-again">Use a different PDF</button>`:`<button class="link" data-act="join-go" data-step="review" ${J.pdf==='reading'?'disabled':''}>Skip, I’ll fill it in myself</button>`}</div>
     </div>`;
   }
   if(J.step==='review'){
@@ -1621,8 +1719,10 @@ function viewJoin(){
     body=`<div class="jcard">
       <h1>Review your profile</h1><p class="lead">This is what members will see. Edit anything that’s off.</p>
       <div class="two">${fld('j-first','First name*',`<input type="text" id="j-first" value="${esc(d.first)}">`)}${fld('j-last','Last name*',`<input type="text" id="j-last" value="${esc(d.last)}">`)}</div>
-      <div class="jsec">${fld('j-head','Headline*',`<input type="text" id="j-head" value="${esc(d.role)}" maxlength="120" placeholder="Ex: MBA Candidate · ex-PM at Monday.com">`)}</div>
-      <div class="jsec"><h3>${I.cap.replace('<svg','<svg width="17" height="17"')}Your MBA ${d.src.edu==='li'?srcTag('li'):''}</h3>
+      <div class="jsec">${fld('j-email','Email*',`<input type="email" id="j-email" value="${esc(d.email||'')}" placeholder="you@example.com">`,'<p class="hint"><span>We send your registration email here once an admin approves you.</span></p>')}</div>
+      <div class="jsec">${fld('j-head','Headline*',`<input type="text" id="j-head" value="${esc(d.role)}" maxlength="220" placeholder="Ex: MBA Candidate · ex-PM at Monday.com">`)}</div>
+      <div class="jsec">${fld('j-about','About',`<textarea id="j-about" maxlength="2600" placeholder="A few lines about your background and what you’re looking for">${esc(d.about||'')}</textarea>`)}</div>
+      <div class="jsec"><h3>${I.cap.replace('<svg','<svg width="17" height="17"')}Your MBA ${d.src.edu==='pdf'?srcTag('pdf'):''}</h3>
         <div class="two">${fld('j-school','School*',`<select id="j-school"><option value="">Select your US MBA program</option>${Object.keys(SCHOOLS).map(k=>`<option value="${esc(k)}" ${k===e.school?'selected':''}>${esc(SCHOOLS[k].full)}</option>`).join('')}</select>`)}
         ${fld('j-year','Class year*',`<select id="j-year">${yearOpts(e.year)}</select>`)}</div></div>
       <div class="jsec"><h3>${I.building.replace('<svg','<svg width="17" height="17"')}Career path</h3>
@@ -1630,72 +1730,144 @@ function viewJoin(){
       </div>
       <div class="jsec two">${fld('j-loc','Location*',`<select id="j-loc">${LOC_OPTIONS.map(l=>`<option ${l===d.location?'selected':''}>${l}</option>`).join('')}</select>`)}${fld('j-ind','Industry*',`<select id="j-ind">${Object.keys(INDUSTRIES).map(l=>`<option ${l===d.industry?'selected':''}>${l}</option>`).join('')}</select>`)}</div>
       <div class="jsec">${fld('j-phone','WhatsApp number',`<input type="tel" id="j-phone" value="${esc(d.phone||'')}" placeholder="+1 (617) 555-0100">`,'<p class="hint"><span>Members you connect with can reach you here. LinkedIn doesn’t share phone numbers, so add it yourself.</span></p>')}</div>
-      <div class="row"><button class="btn lg primary pill" data-act="join-review-next">${J.mode==='sync'?'Save changes':'Continue'}</button>${J.mode==='sync'?'':'<button class="link" data-act="join-go" data-step="imported">Back</button>'}</div>
+      ${J.mode==='sync'?'':`<div class="jsec">${fld('j-liurl','LinkedIn profile URL',`<input type="text" id="j-liurl" value="${esc(J.liurl||'')}" placeholder="linkedin.com/in/your-name">`,'<p class="hint"><span>Helps the admin confirm who you are, so you’re approved faster.</span></p>')}</div>`}
+      <div class="row"><button class="btn lg primary pill" data-act="join-review-next">${J.mode==='sync'?'Save changes':'Continue'}</button>${J.mode==='sync'?'':`<button class="link" data-act="join-go" data-step="${J.manual?'welcome':'imported'}">Back</button>`}</div>
     </div>`;
   }
   if(J.step==='verify'){
-    const e=d.schools[0], sc=SCHOOLS[e.school], viaLI=!!d.src.edu, match=viaLI&&J.liMatch;
-    const members=P.filter(x=>x.id!==ME&&x.schools.some(s=>s.school===e.school));
-    const st=(k)=>k==='ok'?`<span class="st ok">${I.check}</span>`:k==='no'?`<span class="st no">${I.x}</span>`:`<span class="st wait"></span>`;
-    const running=J.check==='running';
-    const checks = viaLI ? `<ul class="checks">
-        <li>${st(running?'w':match?'ok':'no')}<span><b>${esc(sc.tag)} ${yy(e.year)} on your LinkedIn</b><small>${running?'Checking education…':match?`${esc(sc.full)} · ${esc(e.program)}, ${e.start||e.year-2}–${e.year}`:`No ${esc(sc.full)} education with class year ${e.year} found`}</small></span></li>
-        <li>${st(running?'w':'ok')}<span><b>Real person</b><small>${running?'Checking identity…':'Identity verified with government ID on LinkedIn'}</small></span></li>
-        <li>${st(running?'w':'ok')}<span><b>Israeli background</b><small>${running?'Looking for Israeli experience…':'IDF · Unit 8200, Monday.com and Fiverr in Tel Aviv'}</small></span></li>
-      </ul>` : '';
+    const e=d.schools[0], sc=SCHOOLS[e.school];
+    const ev=`<div class="ev">${d.src.name==='pdf'?`<span class="evc ok">${I.check}Profile imported from LinkedIn PDF</span>`:`<span class="evc no">${I.x}Filled in by hand</span>`}${d.src.edu==='pdf'?`<span class="evc ok">${I.check}LinkedIn lists ${esc(sc.tag)} ${yy(e.year)}</span>`:J.manual?'':`<span class="evc no">${I.x}${esc(sc.tag)} not found on LinkedIn PDF</span>`}${J.liurl?`<span class="evc ok">${I.link}LinkedIn URL added</span>`:''}</div>`;
     let main='';
-    if(!running && match){
-      main=`<div class="notice" style="background:var(--ok-soft);color:var(--ok)">${I.check}<span><b>You’re approved automatically.</b> Your LinkedIn shows ${esc(sc.tag)} ${yy(e.year)}, your ID is verified and your background shows Israeli experience.</span></div>
-        <div class="row"><button class="btn lg primary pill" data-act="join-finish" data-status="linkedin">Finish</button></div>`;
-    } else if(!running && J.reqSent){
-      const v = J.voucher? byId(+J.voucher):null;
-      main=`<div class="notice" style="background:var(--warm-soft);color:var(--warm)">${I.clock}<span><b>Request sent.</b> ${v?`${esc(v.name)} gets it first. `:''}Any of the ${members.length} verified ${esc(sc.tag)} members or an admin can approve it. Most requests are approved within a day.</span></div>
+    if(J.reqSent){
+      main=`<div class="notice" style="background:var(--warm-soft);color:var(--warm)">${I.clock}<span><b>Request sent to the admins.</b> Most requests are reviewed within a day. We’ll email ${esc(d.email)} once you’re approved.${BACKEND_URL?'':' <i>(Demo mode: no email was actually sent.)</i>'}</span></div>
         <ol class="track3"><li class="ok"><span class="st">${I.check}</span><span><b>Request submitted</b><small>Just now</small></span></li>
-          <li class="now"><span class="st"></span><span><b>A ${esc(sc.tag)} member reviews it</b><small>They confirm you’re Israeli and studied at ${esc(sc.tag)}</small></span></li>
-          <li><span class="st"></span><span><b>You’re in</b><small>Your profile becomes visible and members can connect with you</small></span></li></ol>
+          <li class="now"><span class="st"></span><span><b>An admin reviews it</b><small>They confirm you’re Israeli and studied at ${esc(sc.tag)}</small></span></li>
+          <li><span class="st"></span><span><b>You get your official welcome email</b><small>You’re an official member: your profile goes live and members can connect with you</small></span></li></ol>
         <div class="row"><button class="btn lg primary pill" data-act="join-finish" data-status="pending">Finish</button></div>`;
-    } else if(!running){
-      main=`${viaLI?`<div class="notice">${I.users}<span>We couldn’t confirm ${esc(sc.tag)} ${yy(e.year)} on your LinkedIn. That’s common for new students. Send a request to join instead, like a private group: a verified ${esc(sc.tag)} member or an admin approves it.</span></div>`:`<p class="lead" style="margin:0">Like a private group: a verified ${esc(sc.tag)} member or an admin approves your request.</p>`}
-        <div class="jsec">${fld('j-voucher','Who in the network can confirm you? (optional)',`<select id="j-voucher"><option value="">Any ${esc(sc.tag)} member</option>${members.map(x=>`<option value="${x.id}" ${+J.voucher===x.id?'selected':''}>${esc(x.name)} · ${esc(schoolTag(x.schools.find(s=>s.school===e.school)))}</option>`).join('')}</select>`,'<p class="hint"><span>They get your request first, which usually makes it faster.</span></p>')}</div>
-        <div class="jsec">${fld('j-liurl','Your LinkedIn profile URL*',`<input type="text" id="j-liurl" value="${esc(J.liurl||(viaLI?'linkedin.com/in/noam-levi':''))}" placeholder="linkedin.com/in/your-name">`)}</div>
+    } else {
+      main=`${J.sendErr?`<div class="notice" style="background:var(--warm-soft);color:var(--warm);margin-bottom:14px">${I.x}<span>${esc(J.sendErr)}</span></div>`:''}<p class="lead" style="margin:0 0 14px">An admin reviews your request by hand. This is what they’ll see:</p>
+        <div class="invite" style="flex-direction:column;align-items:stretch;gap:10px"><span><b>${esc(d.first+' '+d.last)}</b><small>${esc(d.role)}${J.liurl?' · '+esc(J.liurl):''}</small></span>${ev}</div>
         <div class="jsec">${fld('j-answer','Where in Israel are you from, and what did you do before your MBA?*',`<textarea id="j-answer" maxlength="400" placeholder="Ex: Grew up in Haifa, served in 8200, then PM at Monday.com for 4 years.">${esc(J.answer||'')}</textarea>`)}</div>
         <div class="jsec field" id="fw-j-agree"><label class="checkrow"><input type="checkbox" id="j-agree" ${J.agree?'checked':''}>I’m Israeli and I study or studied at ${esc(sc.full)}.</label><p class="err" hidden></p></div>
-        <div class="row"><button class="btn lg primary pill" data-act="join-request-send">Send request to join</button></div>`;
+        <div class="row"><button class="btn lg primary pill" data-act="join-request-send" ${J.sending?'disabled':''}>${J.sending?'Sending…':'Submit for approval'}</button><button class="link" data-act="join-go" data-step="review">Back</button></div>`;
     }
-    body=`<div class="jcard">
-      ${viaLI?`<div class="demo-toggle">Preview outcome: <div class="seg"><button class="${J.liMatch?'on':''}" data-act="join-demo-match" data-v="1">LinkedIn shows the school</button><button class="${!J.liMatch?'on':''}" data-act="join-demo-match" data-v="0">It doesn’t</button></div></div>`:''}
-      <h1>Get approved to join ${esc(sc.tag)} ${yy(e.year)}</h1>
-      <p class="lead">${viaLI?'First we check your LinkedIn. If it shows your school, you’re in right away. If not, a member from your school approves you.':''}</p>
-      ${checks}${main}
-    </div>`;
+    body=`<div class="jcard"><h1>Request to join ${esc(sc.tag)} ${yy(e.year)}</h1>${main}</div>`;
   }
   if(J.step==='done'){
     body=`<div class="jcard" style="text-align:center"><div style="display:flex;justify-content:center"><span class="welcome-mark">${I.check}</span></div>
-      <h1>Welcome, ${esc(me().first)}</h1><p class="lead" style="margin-inline:auto">${me().verify.school==='pending'?'You can browse and search now. Your profile goes live and members can connect with you once a member approves your request.':'Your profile is live. Start by searching for people at the companies you’re targeting.'}</p>
+      <h1>${me().verify.school==='pending'?'Thanks, '+esc(me().first)+'. You’re on the list.':'Welcome, '+esc(me().first)}</h1><p class="lead" style="margin-inline:auto">${me().verify.school==='pending'?`An admin is reviewing your request. We’ll send your official welcome email to ${esc(me().email)} as soon as you’re approved. Until then you can browse, but your profile stays hidden.`:'You’re approved and your registration is complete. Start by searching for people at the companies you’re targeting.'}</p>
+      ${me().verify.school==='pending'&&!BACKEND_URL?`<div class="demo-toggle" style="justify-content:center">Demo mode: <button class="btn sm ghost pill" data-act="join-demo-approve">${I.check}Simulate admin approval</button></div>`:''}
       <div style="display:flex;justify-content:center;margin:6px 0 18px">${pcard(me(),{txt:me().schools[0].school+' · Class of '+me().schools[0].year,ico:'cap'})}</div>
       <div class="row" style="justify-content:center"><button class="btn lg primary pill" data-act="nav" data-view="home">${I.search}Find people</button><button class="btn lg ghost pill" data-act="nav" data-view="me">View my profile</button></div></div>`;
   }
   return `<main><div class="wrap join">${head}${body}</div></main>`;
 }
-function joinRunCheck(){ const J=S.join; J.check = J.draft.src.edu ? 'running' : 'done'; render(); if(J.check==='running') setTimeout(()=>{ if(S.join&&S.join.step==='verify'){ S.join.check='done'; render(); } },1500); }
-function members0(){ const sch=me().schools[0].school; const c=[...adj.get(ME)].find(x=>byId(x).schools.some(s=>s.school===sch)); return c??1; }
 function joinReadReview(){
   const J=S.join, d=J.draft; let ok=true;
   const need=(id,msg)=>{ const bad=!val(id); fieldErr(id,bad?msg:''); if(bad) ok=false; };
-  need('j-first','Enter your first name'); need('j-last','Enter your last name'); need('j-head','Enter a headline'); need('j-school','Select your school');
+  need('j-first','Enter your first name'); const em=val('j-email'); if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){ fieldErr('j-email','Enter a valid email address'); ok=false; } else fieldErr('j-email',''); need('j-last','Enter your last name'); need('j-head','Enter a headline'); need('j-school','Select your school');
   const ph=val('j-phone'); if(ph && ph.replace(/\D/g,'').length<9){ fieldErr('j-phone','Enter a full number with country code'); ok=false; } else fieldErr('j-phone','');
   if(!ok) return false;
   const y=+val('j-year'), sch=val('j-school'), prev=d.schools[0]||{};
-  Object.assign(d,{first:val('j-first'),last:val('j-last'),role:val('j-head'),location:val('j-loc'),industry:val('j-ind'),phone:ph,pref:ph?d.pref:'email'});
+  if(document.getElementById('j-liurl')) J.liurl=val('j-liurl').replace(/^https?:\/\/(www\.)?/,'');
+  Object.assign(d,{first:val('j-first'),last:val('j-last'),role:val('j-head'),email:val('j-email'),about:val('j-about'),location:val('j-loc'),industry:val('j-ind'),phone:ph,pref:ph?d.pref:'email'});
   d.schools=[{school:sch,program:prev.program||'MBA',year:y,start:prev.start||y-2}];
   return true;
 }
+async function joinSubmit(){
+  const J=S.join, d=J.draft, e=d.schools[0];
+  if(!BACKEND_URL){ J.reqSent=true; render(); window.scrollTo(0,0); return; }
+  J.sending=true; J.sendErr=''; render();
+  const payload={first:d.first,last:d.last,email:d.email,headline:d.role,school:SCHOOLS[e.school].full,classYear:e.year,location:d.location,industry:d.industry,
+    phone:d.phone,linkedin:J.liurl||'',source:J.manual?'manual':'linkedin',answer:J.answer,about:d.about,career:d.career.map(({src,...c})=>c)};
+  try{
+    // text/plain keeps this a "simple" request, which Apps Script web apps accept without a CORS preflight
+    const r=await (await fetch(BACKEND_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})).json();
+    if(!r.ok) throw new Error(r.error||'failed');
+    J.reqId=r.id; J.reqSent=true;
+  }catch(err){ J.sendErr='We couldn’t send your request. Check your connection and try again.'; }
+  J.sending=false; render(); window.scrollTo(0,0);
+}
+/* Log in on any device: email a code, then exchange it for the member's saved profile. */
+async function loginPost(body){
+  return (await fetch(BACKEND_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)})).json();
+}
+async function loginSendCode(){
+  const L=S.join.login; L.email=val('l-email').trim(); L.err='';
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(L.email)){ fieldErr('l-email','Enter a valid email address'); return; }
+  if(!BACKEND_URL){ L.err='Logging in needs the live backend. This copy is in demo mode.'; render(); return; }
+  L.busy=true; render();
+  try{
+    const r=await loginPost({action:'login-code',email:L.email});
+    if(r.ok) L.sent=true;
+    else L.err=r.error==='not-member'?'We don’t have a member with that email. Check for typos, or go back and sign up.':'Something went wrong. Try again.';
+  }catch(_){ L.err='We couldn’t reach the server. Check your connection and try again.'; }
+  L.busy=false; render();
+}
+function loginLinkedIn(){
+  const L=S.join.login; L.err='';
+  if(!BACKEND_URL||!LINKEDIN_CLIENT_ID){ L.err='LinkedIn login isn’t set up yet. Get a code by email instead.'; render(); return; }
+  const state=crypto.randomUUID();
+  try{ sessionStorage.setItem(LI_STATE_KEY,state); }catch(_){ }
+  location.href='https://www.linkedin.com/oauth/v2/authorization?'+new URLSearchParams({response_type:'code',client_id:LINKEDIN_CLIENT_ID,
+    redirect_uri:location.origin+location.pathname,scope:'openid profile email',state});
+}
+/* Back from LinkedIn: the page URL carries ?code&state (or ?error). Returns true if this load is a LinkedIn return. */
+function handleLinkedInReturn(){
+  const q=new URLSearchParams(location.search); if(!q.has('state')||!(q.has('code')||q.has('error'))) return false;
+  history.replaceState(null,'',location.pathname);
+  let want=null; try{ want=sessionStorage.getItem(LI_STATE_KEY); sessionStorage.removeItem(LI_STATE_KEY); }catch(_){ }
+  S.firstRun=!loadMe(); joinStart('join'); const L=S.join.login={}; S.join.step='login';
+  if(q.get('state')!==want){ L.err='That LinkedIn login didn’t come from this page. Try again.'; render(); return true; }
+  if(q.has('error')){ L.err='LinkedIn login was cancelled.'; render(); return true; }
+  L.liBusy=true; render();
+  loginPost({action:'linkedin-login',code:q.get('code'),redirectUri:location.origin+location.pathname}).then(r=>{
+    if(r.ok){ loginApply(r.profile); return; }
+    L.err=r.error==='not-member'?`No approved member uses ${esc(r.email)}. Sign up first, or get a code by email if you signed up with a different address.`
+      :r.error==='no-email'?'Your LinkedIn account has no verified email. Get a code by email instead.'
+      :r.error==='not-configured'?'LinkedIn login isn’t set up on the server yet. Get a code by email instead.'
+      :'LinkedIn login didn’t work. Try again, or get a code by email.';
+    L.liBusy=false; render();
+  }).catch(()=>{ L.err='We couldn’t reach the server. Check your connection and try again.'; L.liBusy=false; render(); });
+  return true;
+}
+async function loginVerify(){
+  const L=S.join.login, code=val('l-code').replace(/\D/g,''); L.err='';
+  if(code.length!==6){ fieldErr('l-code','Enter the 6-digit code from the email'); return; }
+  L.busy=true; render();
+  try{
+    const r=await loginPost({action:'login',email:L.email,code});
+    if(r.ok){ loginApply(r.profile); return; }
+    if(r.error==='expired'){ L.sent=false; L.err='That code expired. Request a new one.'; }
+    else L.err=r.error==='wrong-code'?'That code isn’t right. Check the email and try again.':'Something went wrong. Try again.';
+  }catch(_){ L.err='We couldn’t reach the server. Check your connection and try again.'; }
+  L.busy=false; render();
+}
+function loginApply(p){
+  const m=me(), y=+p.classYear||NOW_YEAR;
+  const school=Object.keys(SCHOOLS).find(k=>SCHOOLS[k].full===p.school)||matchSchool(p.school||'')||Object.keys(SCHOOLS)[0];
+  Object.assign(m,{first:p.first,last:p.last,role:p.headline,email:p.email,location:p.location||'Boston',industry:p.industry||Object.keys(INDUSTRIES)[0],
+    phone:String(p.phone||''),pref:p.phone?'whatsapp':'email',about:p.about||'',photo:/^https:\/\//.test(p.photo||'')?p.photo:(m.email===p.email?m.photo:null),reqId:p.id,
+    schools:[{school,program:'MBA',year:y,start:y-2}], career:p.career||[],
+    verify:{school:p.status==='approved'?'admin':'pending',identity:false,workplace:false}});
+  recompute(m); saveMe(); S.firstRun=false; S.join=null; go('home',{},false);
+  toast(p.status==='approved'?`Welcome back, ${esc(p.first)}`:'You’re logged in. Your request is still waiting for an admin.');
+}
+/* Pending members: ask the backend whether an admin has decided yet. */
+async function checkApproval(){
+  const m=me(); if(!BACKEND_URL||m.verify.school!=='pending'||!m.reqId) return;
+  try{
+    const r=await (await fetch(BACKEND_URL+'?action=status&id='+encodeURIComponent(m.reqId))).json();
+    if(r.ok&&r.status==='approved'){ m.verify.school='admin'; saveMe(); render(); toast('You’re approved! You’re now an official member.'); }
+    if(r.ok&&r.status==='declined'){ toast('Your request to join wasn’t approved. Reply to any of our emails if you think that’s a mistake.'); }
+  }catch(_){ }
+}
 function joinApply(schoolStatus){
   const d=S.join.draft, m=me();
-  Object.assign(m,{first:d.first,last:d.last,role:d.role,location:d.location,industry:d.industry,phone:d.phone,pref:d.pref,
+  Object.assign(m,{first:d.first,last:d.last,role:d.role,email:d.email,location:d.location,industry:d.industry,phone:d.phone,pref:d.pref,about:d.about,
     schools:d.schools.map(s=>({...s})), career:d.career.map(({src,...c})=>c)});
-  if(d.about) m.about=d.about;
-  m.verify={school:schoolStatus||m.verify.school, identity:LI_MOCK.vol.identity, workplace:LI_MOCK.vol.workplace};
+  if(S.join.mode!=='sync') m.photo=null;
+  m.verify={school:schoolStatus||m.verify.school, identity:false, workplace:false};
   recompute(m); saveMe();
 }
 
@@ -1734,31 +1906,26 @@ document.addEventListener('click',e=>{
     case 'join-start': joinStart(t.dataset.mode); break;
     case 'join-exit': S.join=null; go(S.stack.length?S.stack[S.stack.length-1].view:'home',S.stack.length?S.stack[S.stack.length-1].params:{}); break;
     case 'join-connect': joinConnect(); break;
-    case 'join-manual': Object.assign(S.join.draft,{first:'',last:'',role:'',schools:[],career:[],src:{}}); S.join.step='review'; render(); break;
+    case 'join-pdf-again': S.join.pdf='none'; S.join.found=null; render(); break;
+    case 'join-login': S.join.login=LINKEDIN_CLIENT_ID?{}:{emailMode:true}; S.join.step='login'; render(); window.scrollTo(0,0); break;
+    case 'login-send': loginSendCode(); break;
+    case 'login-li': loginLinkedIn(); break;
+    case 'login-email-mode': S.join.login={emailMode:true}; render(); break;
+    case 'login-li-mode': if(LINKEDIN_CLIENT_ID){ S.join.login={}; } else S.join.step='welcome'; render(); break;
+    case 'login-verify': loginVerify(); break;
+    case 'login-restart': S.join.login={emailMode:true,email:S.join.login.email}; render(); break;
+    case 'join-manual': S.join.manual=true; S.join.draft.src={}; S.join.step='review'; render(); window.scrollTo(0,0); break;
     case 'join-go': S.join.step=t.dataset.step; render(); window.scrollTo(0,0); break;
     case 'join-rm': S.join.draft.career.splice(+t.dataset.idx,1); render(); break;
-    case 'join-review-next': if(joinReadReview()){ if(S.join.mode==='sync'){ joinApply(); S.join=null; go('me',{},false); toast('Profile updated from LinkedIn'); } else { S.join.step='verify'; S.join.reqSent=false; if(S.join.liMatch===undefined) S.join.liMatch=true; joinRunCheck(); window.scrollTo(0,0); } } break;
-    case 'join-send': { const em=val('j-email').toLowerCase(), sch=S.join.draft.schools[0].school; const okFmt=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em);
-      const okDom= okFmt && SCHOOL_DOMAINS[sch].some(dm=>em.endsWith('@'+dm)||em.endsWith('.'+dm));
-      if(!okFmt){ fieldErr('j-email','Enter a valid email address'); break; }
-      if(!okDom){ fieldErr('j-email',`Use an email ending in ${SCHOOL_DOMAINS[sch].join(' or ')} (subdomains like alum. or sloan. work)`); break; }
-      S.join.email=em; S.join.sent=true; S.join.code=String(Math.floor(100000+Math.random()*900000)); render(); setTimeout(()=>document.getElementById('j-code')?.focus(),30); break; }
-    case 'join-resend': S.join.sent=false; render(); break;
-    case 'join-check': { if(val('j-code')===S.join.code){ S.join.verified=true; render(); } else fieldErr('j-code','That code doesn’t match. Check the email and try again.'); break; }
-    case 'join-alt': S.join.alt=t.dataset.v||null; render(); break;
-    case 'join-vouch-send': S.join.voucher=val('j-voucher'); S.join.alt='vouch-sent'; render(); break;
-    case 'join-admin-send': S.join.alt='admin-sent'; render(); break;
-    case 'join-finish': { const stt=t.dataset.status; joinApply(stt); S.join.step='done'; render(); window.scrollTo(0,0);
-      if(stt==='pending'){ const vid=+S.join.voucher||members0(); setTimeout(()=>{ const m=me(); if(m.verify.school!=='pending') return; m.verify.school='member'; m.verify.approver=vid; saveMe(); softRender(-1); toast(`${esc(byId(vid).first)} approved your request. You’re verified.`); },6000); }
-      break; }
-    case 'join-demo-match': S.join.liMatch = t.dataset.v==='1'; S.join.reqSent=false; joinRunCheck(); break;
-    case 'join-request-send': { const J=S.join; J.voucher=val('j-voucher'); J.liurl=val('j-liurl'); J.answer=val('j-answer'); J.agree=document.getElementById('j-agree').checked; let ok=true;
-      if(!J.liurl){ fieldErr('j-liurl','Add your LinkedIn URL so reviewers can check it'); ok=false; } else fieldErr('j-liurl','');
-      if(J.answer.length<10){ fieldErr('j-answer','Write a sentence or two for the reviewers'); ok=false; } else fieldErr('j-answer','');
+    case 'join-review-next': if(joinReadReview()){ if(S.join.mode==='sync'){ joinApply(); S.join=null; go('me',{},false); toast('Profile updated from LinkedIn'); } else { S.join.step='verify'; S.join.reqSent=false; render(); window.scrollTo(0,0); } } break;
+    case 'join-finish': joinApply(t.dataset.status); me().reqId=S.join.reqId||null; saveMe(); S.firstRun=false; S.join.step='done'; render(); window.scrollTo(0,0); break;
+    case 'join-demo-approve': { const m=me(); m.verify.school='admin'; saveMe(); render(); openRegEmail(m.first,m.email,'An admin approved your request. In the live app this lands in your inbox.'); break; }
+    case 'join-request-send': { const J=S.join; J.answer=val('j-answer'); J.agree=document.getElementById('j-agree').checked; let ok=true;
+      if(J.answer.length<10){ fieldErr('j-answer','Write a sentence or two for the admin'); ok=false; } else fieldErr('j-answer','');
       if(!J.agree){ fieldErr('j-agree','Confirm this to send your request'); ok=false; } else fieldErr('j-agree','');
-      if(ok){ J.reqSent=true; render(); } break; }
-    case 'jr-approve': case 'jr-decline': case 'jr-skip': { const r=S.joinReqs.find(x=>x.id===id); S.joinReqs=S.joinReqs.filter(x=>x.id!==id); render();
-      toast(t.dataset.act==='jr-approve'?`${esc(r.first)} is in. You’re listed as their approver.`:t.dataset.act==='jr-decline'?`Request from ${esc(r.first)} declined`:`Skipped. Other ${esc(SCHOOLS[r.schools[0].school].tag)} members can still review it.`); break; }
+      if(ok) joinSubmit(); break; }
+    case 'jr-approve': case 'jr-decline': { const r=S.joinReqs.find(x=>x.id===id); S.joinReqs=S.joinReqs.filter(x=>x.id!==id); render();
+      if(t.dataset.act==='jr-approve') openRegEmail(r.first,r.email,`You approved ${esc(r.name)}. In the live app this email goes out automatically.`); else toast(`Request from ${esc(r.first)} declined`); break; }
     case 'connections': S.connQ=''; if(S.view==='connections'&&S.params.id===id){ S.params={id,mode:t.dataset.mode}; render(); } else go('connections',{id,mode:t.dataset.mode}); break;
     case 'conn-filters': S.query=''; S.filters={degree:['1st']}; go('results'); break;
     case 'pill': { const k=t.dataset.k; if(S.pill===k){ S.pill=null; } else { S.pill=k; S.draft=[...(S.filters[k]||[])]; } render(); break; }
@@ -1773,21 +1940,21 @@ document.addEventListener('click',e=>{
     case 'delete-item': deleteItem(t.dataset.kind,t.dataset.idx); break;
     case 'add-section': openAddSection(); break;
     case 'photo-remove': photoDraft=null; document.getElementById('photo-prev').innerHTML=av({...me(),photo:null},180); break;
-    case 'reset-me': Object.assign(me(),JSON.parse(JSON.stringify(ME_DEFAULT))); recompute(me()); try{localStorage.removeItem(STORE_KEY)}catch(_){ } render(); toast('Sample profile restored'); break;
+    case 'reset-me': try{localStorage.removeItem(STORE_KEY)}catch(_){ } location.reload(); break;
   }
 });
 document.addEventListener('input',e=>{ if(e.target.id==='conn-q'){ S.connQ=e.target.value; const l=document.getElementById('conn-list'); l.innerHTML=connRows(+l.dataset.id,l.dataset.mode); return; } const c=e.target.dataset.count; if(c){ const max=e.target.maxLength; document.getElementById(c).textContent=`${e.target.value.length}/${max.toLocaleString()}`; } });
 document.addEventListener('change',e=>{
   if(e.target.id==='photo-file'){ readPhoto(e.target.files[0]); return; }
-  if(e.target.id==='li-pdf'){ if(e.target.files[0]) joinPdf(); return; }
+  if(e.target.id==='li-pdf'){ if(e.target.files[0]) joinPdf(e.target.files[0]); return; }
   if(e.target.id==='e-current'){ const end=document.getElementById('e-end'); end.disabled=e.target.checked; if(e.target.checked){ end.insertAdjacentHTML('afterbegin','<option>Present</option>'); end.value='Present'; } else { [...end.options].filter(o=>o.text==='Present').forEach(o=>o.remove()); end.value=String(NOW_YEAR); } return; }
   if(e.target.dataset.draft!==undefined){ const v=e.target.dataset.draft; S.draft = e.target.checked ? [...S.draft,v] : S.draft.filter(x=>x!==v); return; }
   if(e.target.dataset.dk!==undefined){ const k=e.target.dataset.dk, v=e.target.dataset.dv, cur=S.draftAll[k]||[]; S.draftAll[k]= e.target.checked?[...cur,v]:cur.filter(x=>x!==v); return; }
   if(e.target.id==='conn-sort'){ S.connSort=e.target.value; const l=document.getElementById('conn-list'); l.innerHTML=connRows(+l.dataset.id,l.dataset.mode); return; }
   if(e.target.dataset.sort!==undefined){ S.sort=e.target.value; render(); }
 });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeModal(); S.draftAll=null; if(S.pill){ S.pill=null; render(); } } });
-loadMe();
+document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.id==='l-email'){ e.preventDefault(); loginSendCode(); } if(e.key==='Enter'&&e.target.id==='l-code'){ e.preventDefault(); loginVerify(); } if(e.key==='Escape'){ closeModal(); S.draftAll=null; if(S.pill){ S.pill=null; render(); } } });
+if(!handleLinkedInReturn()){ if(!loadMe()){ S.firstRun=true; joinStart('join'); } else checkApproval(); }
 render();
 </script>
 
