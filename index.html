@@ -280,6 +280,33 @@ mark{background:none;color:var(--accent-text);font-weight:700}
 .req{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;flex-wrap:wrap}
 .req .who{flex:1;min-width:180px;text-align:left}
 .req .note{flex-basis:100%;font-size:13.5px;color:var(--muted);background:var(--surface-2);border-radius:10px;padding:10px 12px;margin:0}
+/* feed */
+.feed{max-width:680px}
+.compose{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;margin:14px 0 18px}
+.compose-top{display:flex;gap:12px;align-items:flex-start}
+.compose textarea{flex:1;min-height:76px;resize:vertical;border:1px solid var(--line);border-radius:var(--r-md);padding:10px 12px;font:inherit;background:var(--surface-2);color:var(--ink)}
+.compose-foot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.compose-foot .sp{flex:1}
+.ftype{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;border:1px solid var(--line);background:var(--surface-2);font-size:13.5px;font-weight:600;color:var(--muted)}
+.ftype .dot{width:8px;height:8px;border-radius:50%;background:var(--tc)}
+.ftype.on{background:var(--tc-soft);border-color:var(--tc);color:var(--tc)}
+.compose-photo{position:relative;margin:12px 0 0 52px;display:inline-block}
+.compose-photo img{display:block;max-width:100%;max-height:220px;border-radius:var(--r-md);border:1px solid var(--line)}
+.compose-photo .ibtn{position:absolute;top:6px;right:6px;background:var(--surface);border-radius:50%;box-shadow:var(--shadow)}
+.post-img{display:block;width:100%;max-height:440px;object-fit:cover;border-radius:var(--r-md);border:1px solid var(--line);margin-top:12px}
+.compose .err{color:#C2362F;font-size:12.5px;font-weight:600;margin:8px 0 0}
+.feed-filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.post{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px}
+.post-h{display:flex;gap:12px;align-items:center}
+.post-h .who{flex:1;min-width:0;text-align:left}
+.post-h .who small{display:block;color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ptag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--tc-soft);color:var(--tc);white-space:nowrap}
+.post-b{margin:12px 0 0;font-size:15px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.post-f{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.post-f .when{margin-left:auto;font-size:12.5px;color:var(--faint)}
+.t-job{--tc:var(--accent-text);--tc-soft:var(--accent-soft)}
+.t-hiring{--tc:var(--ok);--tc-soft:var(--ok-soft)}
+.t-event{--tc:var(--warm);--tc-soft:var(--warm-soft)}
 .page-h1{font-family:var(--f-display);font-weight:750;font-size:30px;letter-spacing:-.025em;margin:0 0 6px}
 .seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:11px;padding:3px}
 .seg button{padding:6px 12px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--muted);display:flex;gap:6px;align-items:center}
@@ -611,6 +638,7 @@ const I = {
   left:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
   right:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
   users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"/><circle cx="17" cy="9" r="2.6"/><path d="M17 13.6c2.6.3 4.5 2.6 4.5 5.4"/></svg>',
+  feed:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9h10M7 13h10M7 17h6"/></svg>',
   compass:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z" stroke-linejoin="round"/></svg>',
   user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>',
   shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5" stroke-linecap="round"/></svg>',
@@ -1008,9 +1036,9 @@ function topbar(){
   return `<header class="top"><div class="wrap">
     <button class="brand" data-act="nav" data-view="home"><span class="brand-mark">${markSVG}</span><span class="full">Israeli MBA Network</span></button>
     <div class="top-search">${showSearch?searchBox('compact','q-top'):''}</div>
-    <nav class="nav">${tab('home','Discover',I.compass.replace('<svg','<svg width="17" height="17"'))}${tab('network','My Network',I.users.replace('<svg','<svg width="17" height="17"'))}${tab('me','My Profile',av(me(),22))}</nav>
+    <nav class="nav">${tab('home','Discover',I.compass.replace('<svg','<svg width="17" height="17"'))}${tab('feed','Feed',I.feed.replace('<svg','<svg width="17" height="17"'))}${tab('network','My Network',I.users.replace('<svg','<svg width="17" height="17"'))}${tab('me','My Profile',av(me(),22))}</nav>
   </div></header>
-  <nav class="bottom-nav">${tab('home','Discover',I.compass)}${tab('network','Network',I.users)}${tab('me','Profile',I.user)}</nav>`;
+  <nav class="bottom-nav">${tab('home','Discover',I.compass)}${tab('feed','Feed',I.feed)}${tab('network','Network',I.users)}${tab('me','Profile',I.user)}</nav>`;
 }
 function viewHome(){
   const count = P.length-1;
@@ -1239,6 +1267,96 @@ function viewNetwork(){
   </div></main>`;
 }
 
+/* ---------- feed: short status posts ---------- */
+const FEED_TYPES=[['job','Looking for a job','Open to work? Say what role, industry and city you’re after.'],
+  ['hiring','Hiring','What role is your team hiring for, and where? Offer to refer.'],
+  ['event','Event','What’s happening, when and where?']];
+const FEED_LABEL=Object.fromEntries(FEED_TYPES.map(([k,l])=>[k,l]));
+const FEED_MAX=280, FEED_KEY='imn-feed-v1', HOUR=3600e3;
+const FEED_PHOTO_TYPES=['hiring','event'], FEED_PHOTO_PX=1080;
+/* Sample posts from the sample members: [author id, type, hours ago, text] */
+const FEED_SAMPLE=[
+  [5,'hiring',3,'Our Payments Strategy team at Stripe is hiring a Strategy & Ops lead in SF. Happy to refer Israeli MBAs and grab a coffee to tell you about the team.'],
+  [24,'job',6,'Sloan ’27, ex-McKinsey BA. Looking for a summer 2027 internship in healthtech or climate strategy, Boston or NYC. Would love intros!'],
+  [15,'event',20,'Israeli MBA healthcare mixer in Boston: Thursday, Nov 12, 7pm, at the Flare Capital office. Founders, investors and students. Message me to RSVP.'],
+  [12,'hiring',28,'Ramp is hiring PMs in New York. I can refer you, so send me your resume and the role you’re interested in.'],
+  [13,'job',46,'GSB ’27 recruiting for PM roles at AI startups for summer 2027. Ex-Wix product. Open to SF or NYC.'],
+  [6,'event',52,'Israeli founders x MBAs breakfast at Insight Partners NYC, Friday Nov 20, 8:30am. 30 spots, students first.'],
+  [4,'hiring',75,'Verdant Grid is looking for our first BizOps hire in Boston. Great fit for a Sloan or HBS grad who wants to build from zero.'],
+  [17,'job',90,'Looking for full-time product roles in Boston after Sloan ’27. Ex-Fiverr, 5 years in product analytics.'],
+  [7,'event',120,'Hanukkah party for Israeli MBAs in Boston on Sunday, Dec 6. Sufganiyot on us 🕎 Bring a friend from another program.'],
+  [26,'hiring',150,'Lemonade is hiring a Senior Strategy Associate in NYC, reporting to me. Great for someone 1–2 years out of an MBA.'],
+];
+function loadFeed(){
+  let saved={mine:[],interested:[]};
+  try{ saved=Object.assign(saved,JSON.parse(localStorage.getItem(FEED_KEY)||'{}')); }catch(_){ }
+  const now=Date.now();
+  const sample=FEED_SAMPLE.map(([author,type,h,text],i)=>({id:'s'+i,author,type,text,ts:now-h*HOUR}));
+  return {posts:[...saved.mine,...sample].sort((a,b)=>b.ts-a.ts), interested:new Set(saved.interested)};
+}
+function saveFeed(){
+  try{ localStorage.setItem(FEED_KEY,JSON.stringify({mine:S.feed.posts.filter(p=>p.author===ME),interested:[...S.feed.interested]})); return true; }catch(_){ return false; }
+}
+/* Shrink a post photo so its longer side is at most FEED_PHOTO_PX, keeping its shape. */
+function readFeedPhoto(file){
+  if(!file||!file.type.startsWith('image/')){ toast('Choose an image file (JPG or PNG)'); return; }
+  const fr=new FileReader(); fr.onload=()=>{ const img=new Image(); img.onload=()=>{
+    const k=Math.min(1,FEED_PHOTO_PX/Math.max(img.width,img.height)), c=document.createElement('canvas');
+    c.width=Math.round(img.width*k); c.height=Math.round(img.height*k);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    S.feedDraft.text=val('feed-text'); S.feedDraft.photo=c.toDataURL('image/jpeg',.82); render();
+  }; img.src=fr.result; }; fr.readAsDataURL(file);
+}
+S.feed=loadFeed(); S.feedFilter='all'; S.feedDraft={type:null,text:'',photo:null};
+function ago(ts){
+  const m=Math.max(0,Math.round((Date.now()-ts)/60000));
+  if(m<1) return 'Just now'; if(m<60) return m+'m ago';
+  const h=Math.round(m/60); if(h<24) return h+'h ago';
+  const d=Math.round(h/24); if(d<7) return d+'d ago';
+  return new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+function viewFeed(){
+  const F=S.feed, D=S.feedDraft, f=S.feedFilter;
+  const counts=Object.fromEntries(FEED_TYPES.map(([k])=>[k,F.posts.filter(p=>p.type===k).length]));
+  const shown=F.posts.filter(p=>f==='all'||p.type===f);
+  const hint=D.type?FEED_TYPES.find(t=>t[0]===D.type)[2]:'Pick a type, then share a short update with the network.';
+  const compose=`<div class="compose">
+    <div class="compose-top">${av(me(),40)}<textarea id="feed-text" maxlength="${FEED_MAX}" placeholder="${esc(hint)}" aria-label="Your status">${esc(D.text)}</textarea></div>
+    ${D.photo?`<div class="compose-photo"><img src="${D.photo}" alt="Photo for your post"><button class="ibtn" data-act="feed-photo-rm" aria-label="Remove photo">${I.x}</button></div>`:''}
+    <div class="compose-foot">${FEED_TYPES.map(([k,l])=>`<button class="ftype t-${k} ${D.type===k?'on':''}" data-act="feed-type" data-type="${k}" aria-pressed="${D.type===k}"><span class="dot"></span>${l}</button>`).join('')}
+      ${FEED_PHOTO_TYPES.includes(D.type)&&!D.photo?`<span class="btn sm ghost pill upload">${I.camera}Add photo<input type="file" id="feed-photo" accept="image/*" aria-label="Add a photo"></span>`:''}
+      <span class="sp"></span><span class="muted" style="font-size:12.5px">Up to ${FEED_MAX} characters</span>
+      <button class="btn primary pill" data-act="feed-post">Post</button></div>
+    <p class="err" id="feed-err" hidden></p></div>`;
+  const filters=`<div class="feed-filters" role="group" aria-label="Show posts">${[['all','All posts',F.posts.length],['job','Looking for a job',counts.job],['hiring','Hiring',counts.hiring],['event','Events',counts.event]]
+    .map(([k,l,n])=>`<button class="chip ${f===k?'on':''}" style="${f===k?'border-color:var(--accent);color:var(--accent-text);background:var(--accent-soft)':''}" data-act="feed-filter" data-filter="${k}" aria-pressed="${f===k}">${l}<span class="n">${n}</span></button>`).join('')}</div>`;
+  const post=p=>{ const a=byId(p.author), mine=p.author===ME, going=F.interested.has(p.id);
+    const acts = mine ? `<button class="btn sm ghost pill" data-act="feed-del" data-post="${p.id}">Delete</button>`
+      : p.type==='event' ? `<button class="btn sm ${going?'is-connected':'ghost'} pill" data-act="feed-interest" data-post="${p.id}" aria-pressed="${going}">${going?I.check+'Interested':I.plus+'I’m interested'}</button><button class="btn sm ghost pill" data-act="${a.pref==='whatsapp'?'wa':'email'}" data-id="${a.id}">${a.pref==='whatsapp'?I.wa:I.mail}Message ${esc(a.first)}</button>`
+      : `<button class="btn sm ghost pill" data-act="${a.pref==='whatsapp'?'wa':'email'}" data-id="${a.id}">${a.pref==='whatsapp'?I.wa:I.mail}Message ${esc(a.first)}</button>${connectBtn(a.id,'sm')}`;
+    return `<article class="post t-${p.type}">
+      <div class="post-h">${av(a,44)}<button class="who" data-act="${mine?'nav':'profile'}" ${mine?'data-view="me"':`data-id="${a.id}"`}><b>${esc(a.name)}</b>${mine?' <span class="muted" style="font-size:13px">(you)</span>':''}<small>${esc(a.role)}${a.curCompany?' · '+esc(a.curCompany):''}</small></button>
+        <span class="ptag"><span class="dot" style="width:7px;height:7px;border-radius:50%;background:currentColor"></span>${FEED_LABEL[p.type]}</span></div>
+      <p class="post-b">${esc(p.text)}</p>${p.photo?`<img class="post-img" src="${p.photo}" alt="Photo shared by ${esc(a.first)}" loading="lazy">`:''}
+      <div class="post-f">${acts}<span class="when">${ago(p.ts)}</span></div></article>`; };
+  return `<main><div class="wrap page feed">
+    <h1 class="page-h1">Feed</h1><p class="muted" style="margin:0;font-size:15px">Who’s looking, who’s hiring, and what’s happening in the network.</p>
+    ${compose}${filters}
+    <div class="rlist">${shown.length?shown.map(post).join(''):`<div class="empty-rail">No ${f==='event'?'events':f==='job'?'job seekers':'hiring posts'} yet. Be the first to post one.</div>`}</div>
+  </div></main>`;
+}
+function feedPost(){
+  const D=S.feedDraft, err=document.getElementById('feed-err'); D.text=val('feed-text').trim();
+  const msg=!D.type?'Choose Looking for a job, Hiring or Event.':!D.text?'Write your status first.':'';
+  if(msg){ err.textContent=msg; err.hidden=false; return; }
+  const post={id:'m'+Date.now(),author:ME,type:D.type,text:D.text.slice(0,FEED_MAX),ts:Date.now()};
+  if(D.photo&&FEED_PHOTO_TYPES.includes(D.type)) post.photo=D.photo;
+  S.feed.posts.unshift(post);
+  if(!saveFeed()&&post.photo){ S.feed.posts.shift(); err.textContent='This browser is out of room for more photos. Delete an older photo post, or post without the photo.'; err.hidden=false; return; }
+  S.feedDraft={type:null,text:'',photo:null}; if(S.feedFilter!=='all'&&S.feedFilter!==D.type) S.feedFilter='all';
+  render(); toast('Posted to the feed');
+}
+
 /* ---------- render ---------- */
 function render(){
   let v='';
@@ -1247,6 +1365,7 @@ function render(){
   else if(S.view==='profile') v=viewProfile(S.params.id);
   else if(S.view==='list') v=viewList();
   else if(S.view==='network') v=viewNetwork();
+  else if(S.view==='feed') v=viewFeed();
   else if(S.view==='me') v=viewProfile(ME);
   else if(S.view==='connections') v=viewConnections();
   else if(S.view==='join') v=viewJoin();
@@ -1721,6 +1840,12 @@ document.addEventListener('click',e=>{
     case 'accept': S.incoming.delete(id); markConnected(id); logInteraction(id,'Connected · just now'); softRender(id); toast(`You and ${esc(byId(id).first)} are now connected`,{act:byId(id).pref==='whatsapp'?'wa':'email',id,label:'Say hello'}); break;
     case 'decline': S.incoming.delete(id); render(); toast('Request ignored'); break;
     case 'withdraw': S.pending.delete(id); render(); toast('Request withdrawn'); break;
+    case 'feed-filter': S.feedFilter=t.dataset.filter; render(); break;
+    case 'feed-type': { const D=S.feedDraft; D.text=val('feed-text'); D.type=D.type===t.dataset.type?null:t.dataset.type; if(!FEED_PHOTO_TYPES.includes(D.type)) D.photo=null; render(); } document.getElementById('feed-text').focus(); break;
+    case 'feed-post': feedPost(); break;
+    case 'feed-photo-rm': S.feedDraft.text=val('feed-text'); S.feedDraft.photo=null; render(); break;
+    case 'feed-del': S.feed.posts=S.feed.posts.filter(p=>p.id!==t.dataset.post); saveFeed(); render(); toast('Post deleted'); break;
+    case 'feed-interest': { const k=t.dataset.post, F=S.feed; F.interested.has(k)?F.interested.delete(k):F.interested.add(k); saveFeed(); render(); break; }
     case 'email': openContact(id,'email'); break;
     case 'wa': openContact(id,'wa'); break;
     case 'copy': { const txt=t.dataset.text; const done=()=>{t.innerHTML=I.check+'Copied'}; try{ navigator.clipboard.writeText(txt).then(done,()=>{done()}); }catch(_){ done(); } break; }
@@ -1779,6 +1904,7 @@ document.addEventListener('click',e=>{
 document.addEventListener('input',e=>{ if(e.target.id==='conn-q'){ S.connQ=e.target.value; const l=document.getElementById('conn-list'); l.innerHTML=connRows(+l.dataset.id,l.dataset.mode); return; } const c=e.target.dataset.count; if(c){ const max=e.target.maxLength; document.getElementById(c).textContent=`${e.target.value.length}/${max.toLocaleString()}`; } });
 document.addEventListener('change',e=>{
   if(e.target.id==='photo-file'){ readPhoto(e.target.files[0]); return; }
+  if(e.target.id==='feed-photo'){ readFeedPhoto(e.target.files[0]); return; }
   if(e.target.id==='li-pdf'){ if(e.target.files[0]) joinPdf(); return; }
   if(e.target.id==='e-current'){ const end=document.getElementById('e-end'); end.disabled=e.target.checked; if(e.target.checked){ end.insertAdjacentHTML('afterbegin','<option>Present</option>'); end.value='Present'; } else { [...end.options].filter(o=>o.text==='Present').forEach(o=>o.remove()); end.value=String(NOW_YEAR); } return; }
   if(e.target.dataset.draft!==undefined){ const v=e.target.dataset.draft; S.draft = e.target.checked ? [...S.draft,v] : S.draft.filter(x=>x!==v); return; }
