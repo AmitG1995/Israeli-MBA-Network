@@ -185,6 +185,40 @@ mark{background:none;color:var(--accent-text);font-weight:700}
 .rcard .acts{display:flex;flex-direction:column;gap:8px}
 .tag{font-family:var(--f-mono);font-size:11px;font-weight:500;letter-spacing:.02em;padding:2px 7px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted);vertical-align:2px;margin-left:6px}
 .tag.stu{color:var(--warm);background:var(--warm-soft);border-color:transparent}
+.tag.alum{color:var(--accent-text);background:var(--accent-soft);border-color:transparent}
+.refer{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:650;padding:2px 8px;border-radius:99px;background:var(--ok-soft);color:var(--ok);white-space:nowrap}
+.refer svg{width:12px;height:12px}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.colink{font:inherit;color:inherit;font-weight:inherit;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.colink:hover{color:var(--accent-text);text-decoration-color:currentColor}
+.switch{display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:600;padding:8px 14px 8px 8px;border-radius:99px;border:1px solid var(--line);background:var(--surface-2)}
+.switch .knob{width:38px;height:22px;border-radius:99px;background:var(--faint);position:relative;transition:background .15s;flex:none}
+.switch .knob::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s}
+.switch[aria-checked=true] .knob{background:var(--ok)}
+.switch[aria-checked=true] .knob::after{transform:translateX(16px)}
+.dl{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px 16px;margin:0;font-size:14.5px}
+.dl dt{color:var(--muted);font-size:13px;font-weight:600;padding-top:1px}
+.dl dd{margin:0;min-width:0}
+.dl .none{color:var(--faint)}
+.topic-picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:2px 10px;margin-bottom:14px}
+.mba-sep{border:0;border-top:1px solid var(--line);margin:16px 0}
+.lower{opacity:.97}
+.lower h2{font-size:17px}
+.co-head{display:flex;gap:18px;align-items:center;margin:4px 0 22px}
+.co-head .logo-l{width:64px;height:64px;border-radius:16px;display:grid;place-items:center;font-family:var(--f-display);font-weight:750;font-size:28px;color:#fff;flex:none}
+.co-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.co-stats .chip{white-space:nowrap}
+.co-stats svg{width:14px;height:14px}
+.co-sec{font-family:var(--f-display);font-weight:650;font-size:18px;margin:26px 0 12px}
+.email-mock{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.email-mock .eh{padding:12px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted);display:grid;gap:3px;background:var(--surface-2)}
+.email-mock .eh b{color:var(--ink)}
+.email-mock .eb{padding:16px 14px;font-size:14px;display:flex;flex-direction:column;gap:14px}
+.email-mock .note{white-space:pre-wrap;line-height:1.5;margin:0;padding:12px;border-left:3px solid var(--accent);background:var(--surface-2);border-radius:6px}
+.email-mock .ea{display:flex;gap:10px}
+.email-mock .ea .btn{flex:1}
+.email-mock .fine{font-size:11.5px;color:var(--faint);margin:0}
+@media (max-width:640px){ .dl{grid-template-columns:1fr;gap:2px 0} .dl dd{margin-bottom:10px} }
 .noresults{background:var(--surface);border:1px dashed var(--line);border-radius:var(--r-lg);padding:36px 24px;text-align:center}
 .noresults h2{font-family:var(--f-display);font-weight:650;margin:0 0 6px;font-size:21px}
 .noresults p{color:var(--muted);margin:0 0 18px}
@@ -704,7 +738,7 @@ const JOIN_REQS = [
   {id:101,name:'Tal Ben-David',first:'Tal',last:'Ben-David',hair:'long',role:'Incoming PM',company:'Ramp',schools:[{school:'MIT Sloan',program:'MBA',year:2026}],li:{edu:'MIT Sloan · MBA, 2024–2026',id:false,israeli:'IDF · Intelligence Corps, Wix (Tel Aviv)'},knows:17,answer:'Grew up in Haifa. PM at Wix for 4 years before Sloan, now moving to NYC for a fintech role.',url:'linkedin.com/in/tal-bendavid',asked:'2 hours ago'},
   {id:102,name:'Shai Mor',first:'Shai',last:'Mor',hair:'short',role:'MBA Candidate',company:'MIT Sloan',schools:[{school:'MIT Sloan',program:'MBA',year:2028}],li:{edu:null,id:true,israeli:'Technion, Intel (Haifa)'},knows:null,answer:'From Tel Aviv, ex-Intel engineer. Started at Sloan this fall and haven’t updated LinkedIn yet.',url:'linkedin.com/in/shaimor',asked:'Yesterday'},
 ];
-const EXAMPLES = ['Sloan \'23','Product managers at Google','People from MIT working in healthcare','HBS alumni in New York','Founders in climate tech','People who worked at McKinsey'];
+const EXAMPLES = ['Who can refer at Google','Sloan \'23','Product managers at Google','People from MIT working in healthcare','HBS alumni in New York','Founders in climate tech','People who worked at McKinsey'];
 const INCOMING_NOTES = {25:'Hi Noam! Saw you were at Monday.com before Sloan. I’m a Sloan ’24 at Apple and happy to help with your PM recruiting.',16:'Hey, fellow Waze/Monday alum network here. Would love to swap notes on NYC product roles.'};
 
 /* ---------- build people ---------- */
@@ -720,6 +754,57 @@ const P = RAW.map(([id,name,role,company,location,industry,roleCat,status,school
   const blob = [name,role,company,...car.map(c=>c.role+' '+c.company)].join(' ').toLowerCase();
   return {id,name,first,last,role,company,location,industry,roleCat,status,schools:sc,career:car,curCompany,prev,email,phone,pref,hair,words:blob.split(/[^a-z0-9]+/).filter(Boolean)};
 });
+/* ---------- profile details ----------
+   Every editable profile field is a flat, named property so an external source (the future LinkedIn
+   import) can pre-fill it without touching the UI:
+     canRefer:boolean · unit:string (optional) · ilUni:string · hometown:string · topics:string[]
+     schools[i].concentration:string · schools[i].clubs:string[]
+   id: [canRefer, concentration, clubs, Israeli university, hometown, open-to-talk topics, unit if not in career] */
+const DETAILS = {
+ 0:[false,'Product & Technology',['Israeli Business Club','Product Management Club'],'Tel Aviv University','Ramat Gan',['Product management','Israeli startups','Moving to Boston']],
+ 1:[true,'Strategy & Innovation',['Israeli Business Club','Product Management Club'],'Technion','Haifa',['Product management','Consulting to tech','Recruiting at Google'],'Intelligence Corps'],
+ 2:[true,'Finance',['Israeli Club','Consulting Club'],'Hebrew University','Jerusalem',['Consulting recruiting','Case prep','Growth']],
+ 3:[true,'Healthcare Management',['Healthcare Club'],'Ben-Gurion University','Be’er Sheva',['Digital health','Pharma to tech']],
+ 4:[false,'Entrepreneurship & Innovation',['Energy Club','Israeli Business Club'],'Technion','Haifa',['Climate tech','Fundraising','Founding a startup'],'Engineering Corps'],
+ 5:[true,'Finance',['Israeli Club','Fintech Club'],'Tel Aviv University','Tel Aviv',['Payments','Strategy roles','Bain recruiting']],
+ 6:[false,'Finance',['Venture Capital Club'],'Tel Aviv University','Herzliya',['Venture capital','Breaking into VC'],'Unit 8200'],
+ 7:[true,'Strategy',['Consulting Club','Israeli Business Club'],'Reichman University','Tel Aviv',['Consulting recruiting','Fiverr alumni']],
+ 8:[true,'Healthcare',['Healthcare Club','Israeli Club'],'Technion','Ra’anana',['Wearables','Health tech product'],'Air Force'],
+ 9:[true,'',['Tech Club'],'Technion','Haifa',['Engineering management','Big tech in the Bay']],
+ 10:[true,'Healthcare Management',['Wharton Israel Club'],'Hebrew University','Jerusalem',['Biotech BD','Pharma careers']],
+ 11:[false,'Entrepreneurship',['Israeli Business Club','Fintech Club'],'Tel Aviv University','Netanya',['Fintech','Founding a startup','Goldman to startups'],'Paratroopers'],
+ 12:[true,'Strategy',['Israeli Club'],'Reichman University','Tel Aviv',['Fintech product','Monday.com alumni']],
+ 13:[false,'',['Israeli Club','High Tech Club'],'Tel Aviv University','Modi’in',['Product management','Wix alumni']],
+ 14:[true,'Operations',['Energy Club'],'Technion','Haifa',['Climate tech operations','McKinsey to industry']],
+ 15:[false,'Healthcare',['Healthcare Club','Israeli Business Club'],'Tel Aviv University','Tel Aviv',['Healthcare VC','Medtech']],
+ 16:[true,'Media & Technology',['Israeli Business Club','Tech Club'],'Tel Aviv University','Kfar Saba',['Product management','Recruiting at Google','NYC tech']],
+ 17:[false,'Product & Technology',['Israeli Business Club'],'Reichman University','Rishon LeZion',['Product analytics','Fiverr alumni']],
+ 18:[true,'Strategy',['Tech Club'],'Ben-Gurion University','Be’er Sheva',['Strategy roles','Amazon recruiting']],
+ 19:[true,'Management',['Wharton Israel Club','Tech Club'],'Tel Aviv University','Petah Tikva',['Product management','Microsoft recruiting']],
+ 20:[true,'Finance',['Wharton Israel Club','Finance Club'],'Hebrew University','Jerusalem',['Investment banking','TMT']],
+ 21:[false,'',['Energy Club'],'Weizmann Institute','Rehovot',['Climate tech','Supply chain']],
+ 22:[true,'Healthcare',['Healthcare Club'],'Tel Aviv University','Tel Aviv',['Health tech product','Oncology data']],
+ 23:[true,'',['MIT Sloan Israel Club'],'Hebrew University','Jerusalem',['Consulting','Pharma strategy']],
+ 24:[false,'Strategy',['Consulting Club','Israeli Business Club'],'Tel Aviv University','Haifa',['Consulting recruiting']],
+ 25:[true,'Product & Technology',['Israeli Business Club'],'Technion','Haifa',['Product management','Apple recruiting','Mobileye alumni']],
+ 26:[false,'',['HBS Israel Club'],'Reichman University','Tel Aviv',['Chief of staff roles','Insurtech']],
+};
+const UNIT_RE = /^IDF · /;
+function splitUnit(p){ const u=p.career.find(c=>UNIT_RE.test(c.company)); if(u){ if(!p.unit) p.unit=u.company.replace(UNIT_RE,''); p.career=p.career.filter(c=>!UNIT_RE.test(c.company)); } }
+P.forEach(p=>{
+  const [canRefer,conc,clubs,ilUni,hometown,topics,unit]=DETAILS[p.id]||[false,'',[],'','',[]];
+  Object.assign(p,{canRefer:!!canRefer && p.status!=='Student',ilUni,hometown,topics:[...topics],unit:unit||''});
+  p.schools[0].concentration=conc; p.schools[0].clubs=[...clubs];
+  splitUnit(p);
+});
+/* One canonical name per company, so "Google LLC", "google" and "Google" all land on one company page. */
+const CO_SUFFIX = /[,\s]+(llc|inc\.?|ltd\.?|corp\.?|corporation|co\.|plc|l\.p\.|lp|gmbh)$/i;
+function canonCompany(raw){
+  const s=String(raw||'').trim().replace(CO_SUFFIX,'').trim(); if(!s) return '';
+  const k=s.toLowerCase();
+  const known=[...new Set(P.flatMap(p=>[p.curCompany,...p.prev,...p.career.map(c=>c.company)]).filter(Boolean))];
+  return known.find(c=>c.toLowerCase()===k) || Object.keys(COMPANY_ALIASES).find(c=>COMPANY_ALIASES[c].includes(k)) || s;
+}
 P.forEach(p=>{ p.verify = {school: p.id%2?'linkedin':'member', identity: p.id%3!==2, workplace: !!p.curCompany && p.id%4===1}; });
 EDGES.forEach(([a,b])=>{ [[a,b],[b,a]].forEach(([x,y])=>{ const px=P[x], py=P[y]; if(px.verify.school==='member' && px.verify.approver==null && py.schools.some(s=>px.schools.some(t=>t.school===s.school))) px.verify.approver=y; }); });
 P.forEach(p=>{ if(p.verify.school==='member' && p.verify.approver==null) p.verify.school='admin'; });
@@ -731,6 +816,8 @@ EDGES.forEach(([a,b])=>{adj.get(a).add(b);adj.get(b).add(a)});
 const S = {
   view:'home', params:{}, stack:[],
   pending:new Set(), incoming:new Set([25,16]),
+  /* every intro request: {to, note, status:'pending'|'accepted'|'declined', sentAt, respondedAt}. "Connects" KPI = intros.length */
+  intros:[],
   viewed:[8,22,14],
   interacted:[{id:1,label:'WhatsApp · 2d ago'},{id:4,label:'Connected · 5d ago'},{id:17,label:'Emailed · 1w ago'},{id:12,label:'Connected · 2w ago'},{id:7,label:'WhatsApp · 3w ago'}],
   query:'', filters:{}, sort:'relevance', showFilters:false, browse:null, netTab:'connections', recent:[], pill:null, draft:[], draftAll:null, connQ:'', connSort:'recent',
@@ -748,7 +835,10 @@ function classBadge(s,size=''){
 }
 const badges = (p,size='') => p.schools.map(s=>classBadge(s,size)).join(' ');
 const mutuals = id => id===ME?[]:[...adj.get(id)].filter(x=>x!==ME && adj.get(ME).has(x));
-const connState = id => adj.get(ME).has(id)?'connected':S.pending.has(id)?'pending':S.incoming.has(id)?'incoming':'none';
+const lastIntro = id => [...S.intros].reverse().find(r=>r.to===id);
+const connState = id => adj.get(ME).has(id)?'connected':S.pending.has(id)?'pending':S.incoming.has(id)?'incoming':lastIntro(id)?.status==='declined'?'declined':'none';
+/* Phone and email unlock only once you're connected, i.e. an intro between you was accepted. */
+const canSeeContact = id => id===ME || adj.get(ME).has(id);
 const me = () => byId(ME);
 const sharedSchool = p => p.schools.find(s=>me().schools.some(m=>m.school===s.school));
 const sharedPrev = p => [...p.prev, p.curCompany].filter(Boolean).find(c=>me().prev.includes(c));
@@ -809,6 +899,7 @@ function parseQuery(q){
   let s = ' '+q.toLowerCase().replace(/[\u2018\u2019]/g,"'")+' ';
   const facets = {school:[],company:[],location:[],industry:[],role:[],status:[],year:[]};
   const addY = y=>{ if(!facets.year.includes(y)) facets.year.push(y); };
+  s = s.replace(/(^|[^a-z])(can refer|who can refer|referrals?|refer(rers?)?)(?=$|[^a-z])/g,(m,a)=>{facets.refer=true;return a+' '});
   s = s.replace(/class of\s*(20\d{2})/g,(m,y)=>{addY(+y);return ' '});
   s = s.replace(/(^|[^a-z0-9])(20[12]\d)(?=$|[^0-9])/g,(m,a,y)=>{addY(+y);return a+' '});
   s = s.replace(/'(\d{2})(?=$|[^0-9])/g,(m,y)=>{addY(2000+ +y);return ' '});
@@ -829,6 +920,8 @@ function matchFacets(p,f){
   if(f.role.length && !f.role.includes(p.roleCat)) return false;
   if(f.location.length && !f.location.includes(p.location)) return false;
   if(f.status.length && !f.status.includes(p.status)) return false;
+  if(f.refer && !p.canRefer) return false;
+  if(f.refer && f.company.length && !f.company.includes(p.curCompany)) return false; // referrals only at the current company
   return true;
 }
 function reasonFor(p,f,rest){
@@ -840,6 +933,7 @@ function reasonFor(p,f,rest){
   f.role.forEach(r=>{ if(p.roleCat===r) parts.push(r==='Founder'?'Founder':r==='Investor'?'Investor':r+' role')});
   f.location.forEach(l=>{ if(p.location===l) parts.push(l)});
   f.status.forEach(s=>{ if(p.status===s) parts.push(s==='Student'?'Current student':'Alum')});
+  if(f.refer && p.canRefer) parts.push(`Can refer at ${p.curCompany}`);
   if(parts.length===1 && /^(Currently|Worked)/.test(parts[0])) return parts[0];
   if(parts.length) return 'Matches: '+parts.join(' + ');
   if(rest.length) return 'Name or title match';
@@ -856,10 +950,11 @@ const FILTER_DEFS = [
   ['location','Location',p=>[p.location]],
   ['program','Program',p=>p.schools.map(s=>s.program)],
   ['status','Student / Alum',p=>[p.status]],
+  ['refer','Can refer',p=>p.canRefer?['Can refer']:[]],
 ];
 function runSearch(q){
   const {facets,rest} = parseQuery(q);
-  const hasFacets = Object.values(facets).some(a=>a.length);
+  const hasFacets = Object.values(facets).some(a=>a===true||a.length);
   let base = P.filter(p=>p.id!==ME && matchFacets(p,facets));
   if(rest.length){
     const r = base.filter(p=>rest.every(t=>p.words.some(w=>w.startsWith(t))));
@@ -870,6 +965,7 @@ function runSearch(q){
     const m = mutuals(p.id).length;
     let score = m*1.5 + (sharedSchool(p)?1:0) + (sharedPrev(p)?1:0);
     facets.company.forEach(c=>{ if(p.curCompany===c) score+=4; });
+    if(p.canRefer) score+=.5;
     return {p,score,m,reason:reasonFor(p,facets,rest)};
   });
   const yr=p=>Math.max(...p.schools.map(s=>s.year));
@@ -893,12 +989,16 @@ function doSearch(q){
 
 /* ---------- components ---------- */
 function connectBtn(id,size=''){
+  if(id===ME) return `<button class="btn ${size} ghost" data-act="nav" data-view="me">Your profile</button>`;
   const st = connState(id), p=byId(id);
   const a = `data-conn="${id}" data-size="${size}"`;
-  if(st==='connected') return `<button class="btn ${size} is-connected" ${a} aria-label="Connected with ${esc(p.first)}">${I.check}Connected</button>`;
-  if(st==='pending') return `<button class="btn ${size} is-pending" ${a} data-act="pending" data-id="${id}">${I.clock}Request sent</button>`;
-  if(st==='incoming') return `<button class="btn ${size} primary" ${a} data-act="accept" data-id="${id}">${I.check}Accept</button>`;
-  return `<button class="btn ${size} primary" ${a} data-act="connect" data-id="${id}">${I.plus}Connect</button>`;
+  if(st==='connected') return p.pref==='whatsapp'
+    ? `<button class="btn ${size} wa" ${a} data-act="wa" data-id="${id}">${I.wa}WhatsApp</button>`
+    : `<button class="btn ${size} mail" ${a} data-act="email" data-id="${id}">${I.mail}Email</button>`;
+  if(st==='pending') return `<button class="btn ${size} is-pending" ${a} data-act="pending" data-id="${id}">${I.clock}Intro sent</button>`;
+  if(st==='incoming') return `<button class="btn ${size} primary" ${a} data-act="accept" data-id="${id}">${I.check}Accept intro</button>`;
+  if(st==='declined') return `<button class="btn ${size} ghost" ${a} data-act="declined-info" data-id="${id}">Not available</button>`;
+  return `<button class="btn ${size} primary" ${a} data-act="connect" data-id="${id}">${I.mail}Contact</button>`;
 }
 function searchBox(size,id){
   const v = S.view==='results' && size!=='compact' ? S.query : (size==='compact'?'':'');
@@ -909,12 +1009,16 @@ function searchBox(size,id){
     <div class="ac" hidden role="listbox"></div>
   </div>`;
 }
+const statusTag = (p,style='') => `<span class="tag ${p.status==='Student'?'stu':'alum'}" ${style?`style="${style}"`:''}>${p.status==='Student'?'STUDENT':'ALUMNI'}</span>`;
+const referBadge = p => p.canRefer ? `<span class="refer">${I.check}Can refer</span>` : '';
+const coName = p => p.curCompany ? `<button class="colink" data-act="company" data-co="${esc(p.curCompany)}">${esc(p.curCompany)}</button>` : esc(p.company);
 function pcard(p,signal,warm){
   const sg = signal || relevance(p);
   return `<article class="pcard">
     <button class="pcard-hit" data-act="profile" data-id="${p.id}">
       <span class="pc-top">${av(p,64)}<span class="cbs">${badges(p,'md')}</span></span>
       <div><div class="nm">${esc(p.name)}</div><div class="rl">${esc(p.role)} · ${esc(p.company)}</div></div>
+      <span class="card-tags">${statusTag(p,'margin:0')}${referBadge(p)}</span>
     </button>
     <span class="signal ${warm?'warm':''}">${I[sg.ico]||I.users}<span>${esc(sg.txt)}</span></span>
     <div class="pcard-actions"><button class="btn sm ghost" data-act="profile" data-id="${p.id}">View profile</button>${connectBtn(p.id,'sm')}</div>
@@ -929,7 +1033,7 @@ function rowAction(p){
   if(connState(p.id)==='connected') return `<button class="btn sm pill outline" data-act="${p.pref==='whatsapp'?'wa':'email'}" data-id="${p.id}">${p.pref==='whatsapp'?I.wa+'WhatsApp':I.mail+'Email'}</button>`;
   return connectBtn(p.id,'sm pill outline');
 }
-function markConnected(id){ markConnected(id); S.connOrder=[id,...S.connOrder.filter(x=>x!==id)]; S.connAt[id]='just now'; }
+function markConnected(id){ adj.get(ME).add(id); adj.get(id).add(ME); S.connOrder=[id,...S.connOrder.filter(x=>x!==id)]; S.connAt[id]='just now'; }
 function mutualLineOld(id,max=3){
   const ms = mutuals(id).map(byId); if(!ms.length) return '';
   const names = ms.slice(0,max).map(m=>m.first);
@@ -945,8 +1049,8 @@ function rrow(p,extra=''){
   return `<li class="rrow">
     <button data-act="profile" data-id="${p.id}" aria-label="Open ${esc(p.name)}">${av(p,64)}</button>
     <div class="main">
-      <div class="nmline"><button class="nm" data-act="profile" data-id="${p.id}">${esc(p.name)}</button><span class="deg">• ${degreeOf(p)}</span>${badges(p,'md')}${p.status==='Student'?'<span class="tag stu" style="margin:0">STUDENT</span>':''}</div>
-      <div class="rl">${esc(p.role)} · <b>${esc(p.company)}</b></div>
+      <div class="nmline"><button class="nm" data-act="profile" data-id="${p.id}">${esc(p.name)}</button><span class="deg">• ${degreeOf(p)}</span>${badges(p,'md')}${statusTag(p,'margin:0')}${referBadge(p)}</div>
+      <div class="rl">${esc(p.role)} · <b>${coName(p)}</b></div>
       <div class="sub2">${esc(p.location)} · ${p.schools.map(s=>esc(`${SCHOOLS[s.school].full}, Class of ${s.year}`)).join(' · ')}</div>
       ${extra}
     </div>
@@ -957,8 +1061,8 @@ function rcard(r){
   return `<article class="rcard">
     <button data-act="profile" data-id="${p.id}" aria-label="Open ${esc(p.name)}">${av(p,72)}</button>
     <div class="main">
-      <div><button class="nm" data-act="profile" data-id="${p.id}">${esc(p.name)}</button> <span style="margin-left:8px">${badges(p,'md')}</span>${p.status==='Student'?'<span class="tag stu">STUDENT</span>':''}</div>
-      <div class="rl">${esc(p.role)} · <b>${esc(p.company)}</b></div>
+      <div><button class="nm" data-act="profile" data-id="${p.id}">${esc(p.name)}</button> <span style="margin-left:8px">${badges(p,'md')}</span>${statusTag(p)} ${referBadge(p)}</div>
+      <div class="rl">${esc(p.role)} · <b>${coName(p)}</b></div>
       <div class="meta"><span>${I.cap}${p.schools.map(s=>esc(`${SCHOOLS[s.school].full} · ${s.program}, Class of ${s.year}`)).join(', ')}</span><span>${I.pin}${esc(p.location)}</span><span>${I.layers}${esc(p.industry)}</span></div>
       <span class="signal">${I.spark}<span>${esc(r.reason)}</span></span>
       ${mutualLine(p.id)}
@@ -1042,9 +1146,9 @@ function browsePanel(tab){
     return `<div class="browse"><div class="browse-h"><span>Browse by school and class year</span><button class="arrow" data-act="browse" data-tab="school" aria-label="Close">${I.x}</button></div>${rows}</div>`;
   }
   return `<div class="browse"><div class="browse-h"><span>${title}</span><button class="arrow" data-act="browse" data-tab="${tab}" aria-label="Close">${I.x}</button></div>
-    <div class="chips">${items.map(([k,n])=>`<button class="chip" data-act="search" data-q="${esc(k)}">${esc(k)}<span class="n">${n}</span></button>`).join('')}</div></div>`;
+    <div class="chips">${items.map(([k,n])=>`<button class="chip" ${tab==='company'?`data-act="company" data-co="${esc(k)}"`:`data-act="search" data-q="${esc(k)}"`}>${esc(k)}<span class="n">${n}</span>${tab==='company'&&companyStats(k).refer?`<span class="refer" style="padding:1px 6px;font-size:11px">${companyStats(k).refer} can refer</span>`:''}</button>`).join('')}</div></div>`;
 }
-const PILLS=['degree','school','year','curCompany','industry','location'];
+const PILLS=['refer','school','year','curCompany','industry','location','degree'];
 const FL = Object.fromEntries(FILTER_DEFS.map(([k,l])=>[k,l]));
 FL.location='Locations'; FL.degree='Connections';
 const optLabel=(k,v)=> k==='year'?`Class of ${v}`: k==='degree'?({'1st':'1st','2nd':'2nd','3rd+':'3rd+'}[v]||v) : v;
@@ -1077,8 +1181,9 @@ function openAllFilters(){
   </aside></div>`;
 }
 function viewResults(){
-  const {base,list} = runSearch(S.query);
+  const {base,list,facets} = runSearch(S.query);
   const n=activeCount();
+  const coBanner = facets.company.length===1 ? (()=>{ const c=facets.company[0], st=companyStats(c); return `<button class="how" style="margin:0 0 14px" data-act="company" data-co="${esc(c)}">${I.building.replace('<svg','<svg width="18" height="18"')}<span><b>Israelis at ${esc(c)}</b>: ${st.current.length} member${st.current.length===1?'':'s'}${st.refer?`, ${st.refer} can refer`:''}</span><span class="link" style="margin-left:auto">Company page</span><span class="chev" style="margin-left:0">${I.right}</span></button>`; })() : '';
   let body;
   if(list.length) body = `<ul class="rl2">${list.map(r=>rrow(r.p,`<span class="signal">${I.spark}<span>${esc(r.reason)}</span></span>${mutualLine(r.p.id)}`)).join('')}</ul>`;
   else body = `<div class="noresults" style="border:0;box-shadow:none"><h2>No results found</h2>
@@ -1087,6 +1192,7 @@ function viewResults(){
     <div class="chips">${EXAMPLES.map(e=>`<button class="chip" data-act="search" data-q="${esc(e)}">${esc(e)}</button>`).join('')}</div></div>`;
   return `<main><div class="wrap page"><div class="res-wrap">
     ${searchBox('mid','q-results')}
+    ${coBanner}
     <div class="pillbar">
       <span class="fpill type">People</span><span class="vsep"></span>
       ${PILLS.map(k=>pill(k,base)).join('')}
@@ -1134,6 +1240,23 @@ function viewConnections(){
   const {id,mode}=S.params;
   return `<main><div class="wrap page"><div class="res-wrap"><button class="back" data-act="back">${I.left}Back</button>${connBox(id,mode)}</div></div></main>`;
 }
+function companyStats(co){
+  const current=P.filter(p=>p.curCompany===co), past=P.filter(p=>p.prev.includes(co)&&p.curCompany!==co);
+  return {current,past,refer:current.filter(p=>p.canRefer).length};
+}
+function viewCompany(){
+  const co=S.params.co; const {current,past,refer}=companyStats(co);
+  let h=0; for(const c of co) h=(h*31+c.charCodeAt(0))>>>0;
+  const grid = arr => `<div class="grid">${arr.sort((a,b)=>(b.canRefer-a.canRefer)||(mutuals(b.id).length-mutuals(a.id).length)).map(p=>pcard(p,p.curCompany===co?null:{txt:`Ex-${co}`,ico:'building'})).join('')}</div>`;
+  return `<main><div class="wrap page">
+    <button class="back" data-act="back">${I.left}Back</button>
+    <div class="co-head"><span class="logo-l" style="background:${LOGO_COLORS[h%LOGO_COLORS.length]}">${esc(co.replace(/^The /,'')[0])}</span>
+      <div><h1 class="page-h1" style="margin:0">Israelis at ${esc(co)}</h1>
+      <div class="co-stats"><span class="chip" style="cursor:default">${I.users}${current.length} member${current.length===1?'':'s'}</span>${refer?`<span class="refer" style="font-size:13px;padding:6px 12px">${I.check}${refer} can refer</span>`:''}${past.length?`<span class="chip" style="cursor:default">${past.length} worked here before</span>`:''}</div></div></div>
+    ${current.length?`<h2 class="co-sec">Work here now</h2>${grid(current)}`:`<div class="empty-rail">No members work at ${esc(co)} right now.</div>`}
+    ${past.length?`<h2 class="co-sec">Worked here before</h2>${grid(past)}`:''}
+  </div></main>`;
+}
 function viewList(){
   const d = railData(S.params.key);
   return `<main><div class="wrap page">
@@ -1150,36 +1273,61 @@ function commonGround(p){
   if(p.industry===m.industry) out.push([I.layers,`Both in ${p.industry}`]);
   if(p.location===m.location) out.push([I.pin,`Both based in ${p.location}`]);
   const ms = mutuals(p.id).length; if(ms) out.push([I.users,`${ms} mutual connection${ms>1?'s':''}`]);
-  const unit = p.career.find(c=>c.company.startsWith('IDF')); const myUnit = m.career.find(c=>c.company.startsWith('IDF'));
-  if(unit && myUnit && unit.company===myUnit.company) out.push([I.shield,`Both served in ${unit.company.replace('IDF · ','')}`]);
+  if(p.unit && m.unit && p.unit===m.unit) out.push([I.shield,`Both served in ${p.unit}`]);
+  if(p.ilUni && m.ilUni && p.ilUni===m.ilUni) out.push([I.cap,`Both studied at ${p.ilUni}`]);
+  if(p.hometown && m.hometown && p.hometown===m.hometown) out.push([I.pin,`Both from ${p.hometown}`]);
   return out;
 }
-function timeline(p,editable){
+function timeline(p,editable,includeEdu=false){
   const items = p.career.map((c,i)=>({...c,edu:false,idx:i,role:c.role+(c.location?` · ${c.location}`:'')}));
-  p.schools.forEach((s,i)=>{ const cur=s.year>NOW_YEAR; items.push({idx:i,start:s.start,years:cur?`${s.start||s.year-2}–Present`:`${s.start||s.year-2}–${s.year}`,company:SCHOOLS[s.school].full,color:SCHOOLS[s.school].color,tag:SCHOOLS[s.school].tag,role:cur?`${s.program} candidate · Class of ${s.year}`:`${s.program} · Class of ${s.year}`,edu:true}); });
+  if(includeEdu) p.schools.forEach((s,i)=>{ const cur=s.year>NOW_YEAR; items.push({idx:i,start:s.start,years:cur?`${s.start||s.year-2}–Present`:`${s.start||s.year-2}–${s.year}`,company:SCHOOLS[s.school].full,color:SCHOOLS[s.school].color,tag:SCHOOLS[s.school].tag,role:cur?`${s.program} candidate · Class of ${s.year}`:`${s.program} · Class of ${s.year}`,edu:true}); });
   const span = y=>{const m=y.split('–'),st=+m[0],en=m[1]?(m[1]==='Present'?9999:+m[1]):st; return [st,en]};
   items.sort((a,b)=>{const A=span(a.years),B=span(b.years); return B[1]-A[1]||B[0]-A[0]});
   return `<ol class="tl">${items.map(it=>{
     const now = /Present/.test(it.years);
     return `<li class="${now?'now':''} ${it.edu?'edu':''}" ${it.edu?`style="--sc:${it.color}"`:''}><span class="yr">${esc(it.years)}</span><span class="rail-l"><span class="dot"></span></span>
-      <div class="entry">${logo(it.company,it.edu,it.color,it.tag)}<div><div class="co">${esc(it.company)}${it.edu?' <span style="margin-left:6px">'+classBadge({school:Object.keys(SCHOOLS).find(k=>SCHOOLS[k].full===it.company),year:+it.role.match(/\d{4}/)[0],program:''})+'</span>':''}${now&&!it.edu?'<span class="now-tag">NOW</span>':''}</div><div class="ro">${esc(it.role)}</div></div>${editable?`<button class="ibtn row-edit" data-act="edit" data-kind="${it.edu?'edu':'exp'}" data-idx="${it.idx}" aria-label="Edit ${esc(it.company)}">${I.pencil}</button>`:''}</div></li>`;
+      <div class="entry">${logo(it.company,it.edu,it.color,it.tag)}<div><div class="co">${it.edu?esc(it.company):`<button class="colink" data-act="company" data-co="${esc(it.company)}">${esc(it.company)}</button>`}${it.edu?' <span style="margin-left:6px">'+classBadge({school:Object.keys(SCHOOLS).find(k=>SCHOOLS[k].full===it.company),year:+it.role.match(/\d{4}/)[0],program:''})+'</span>':''}${now&&!it.edu?'<span class="now-tag">NOW</span>':''}</div><div class="ro">${esc(it.role)}</div></div>${editable?`<button class="ibtn row-edit" data-act="edit" data-kind="${it.edu?'edu':'exp'}" data-idx="${it.idx}" aria-label="Edit ${esc(it.company)}">${I.pencil}</button>`:''}</div></li>`;
   }).join('')}</ol>`;
+}
+function mbaPanel(p,isMe){
+  const rows = p.schools.map((s,i)=>`<div class="mba-item">
+    <div class="panel-h"><div><b style="font-size:15.5px">${esc(SCHOOLS[s.school].full)}</b> ${classBadge(s,'md')}</div>${isMe?`<button class="ibtn" data-act="edit" data-kind="edu" data-idx="${i}" aria-label="Edit ${esc(SCHOOLS[s.school].tag)} details">${I.pencil}</button>`:''}</div>
+    <dl class="dl" style="margin-top:10px">
+      <dt>Program</dt><dd>${esc(s.program)}</dd>
+      <dt>${s.year>NOW_YEAR?'Graduating':'Graduated'}</dt><dd>${s.year}</dd>
+      <dt>Concentration</dt><dd>${s.concentration?esc(s.concentration):'<span class="none">Not added</span>'}</dd>
+      <dt>Clubs</dt><dd>${(s.clubs||[]).length?esc(s.clubs.join(' · ')):'<span class="none">Not added</span>'}</dd>
+    </dl></div>`).join('<hr class="mba-sep">');
+  return `<section class="panel"><div class="panel-h"><div><h2>MBA</h2><p class="sub">School, class, concentration and clubs</p></div>${isMe?`<button class="ibtn" data-act="edit" data-kind="edu" aria-label="Add education">${I.add}</button>`:''}</div>${rows}</section>`;
+}
+function israelPanel(p,isMe){
+  const row=(label,v,optional)=> v?`<dt>${label}</dt><dd>${esc(v)}</dd>`: isMe?`<dt>${label}</dt><dd class="none">${optional?'Optional. Leave blank if you prefer':'Not added'}</dd>`:'';
+  const body = row('Unit / service',p.unit,true)+row('Israeli university',p.ilUni)+row('Hometown',p.hometown);
+  if(!body && !isMe) return '';
+  return `<section class="panel lower"><div class="panel-h"><div><h2>Israeli background</h2></div>${isMe?`<button class="ibtn" data-act="edit" data-kind="israel" aria-label="Edit Israeli background">${I.pencil}</button>`:''}</div>
+    <dl class="dl" style="margin-top:12px">${body}</dl></section>`;
+}
+function topicsPanel(p,isMe){
+  if(!p.topics.length && !isMe) return '';
+  return `<section class="panel lower"><div class="panel-h"><div><h2>Open to talking about</h2><p class="sub">${isMe?'Industries and topics members can reach out about':'Good reasons to reach out to '+esc(p.first)}</p></div>${isMe?`<button class="ibtn" data-act="edit" data-kind="topics" aria-label="Edit topics">${I.pencil}</button>`:''}</div>
+    ${p.topics.length?`<div class="chips">${p.topics.map(t=>`<span class="chip" style="cursor:default">${esc(t)}</span>`).join('')}</div>`:'<p class="muted" style="margin:0">Add a few so members know what to ask you about.</p>'}</section>`;
 }
 function viewProfile(id){
   const p = byId(id), isMe = id===ME;
   const ms = mutuals(id).map(byId);
   const cg = commonGround(p);
   const prefLabel = p.pref==='whatsapp'?'Prefers WhatsApp':'Prefers email';
-  const names = ms.slice(0,3).map(m=>m.first); const more = ms.length-names.length;
   const how = isMe ? '' : ms.length
     ? `<button class="how" data-act="connections" data-id="${id}" data-mode="mutual"><span class="stack">${ms.slice(0,4).map(m=>av(m,30)).join('')}</span><span><b>${esc(mutualText(ms))}</b></span><span class="link" style="margin-left:auto">Show all</span><span class="chev" style="margin-left:0">${I.right}</span></button>`
     : `<div class="how">${I.spark.replace('<svg','<svg width="18" height="18"')}<span>No mutual connections yet. ${cg.length?`You share: <b>${esc(cg[0][1])}</b>.`:'Everyone here joined to be reached, so a short intro goes a long way.'}</span></div>`;
-  const actions = isMe ? `<div class="pactions"><button class="btn primary pill" data-act="add-section">Add profile section</button>
+  const st = connState(id);
+  const actions = isMe ? `<div class="pactions">${p.curCompany?`<button class="switch" role="switch" aria-checked="${!!p.canRefer}" data-act="toggle-refer"><span class="knob"></span>I can refer people at ${esc(p.curCompany)}</button>`:''}
       <button class="btn ghost pill" data-act="edit" data-kind="contact">${I.mail}Contact info</button>
       <button class="btn ghost pill" data-act="join-start" data-mode="sync">${I.link}Update from LinkedIn</button></div>`
-    : `<div class="pactions">${connectBtn(id,'lg')}
+    : st==='connected' ? `<div class="pactions">
       <button class="btn lg mail" data-act="email" data-id="${id}">${I.mail}Email${p.pref==='email'?'<span class="pref-dot">PREFERRED</span>':''}</button>
-      <button class="btn lg wa" data-act="wa" data-id="${id}">${I.wa}WhatsApp${p.pref==='whatsapp'?'<span class="pref-dot">PREFERRED</span>':''}</button></div>`;
+      <button class="btn lg wa" data-act="wa" data-id="${id}">${I.wa}WhatsApp${p.pref==='whatsapp'?'<span class="pref-dot">PREFERRED</span>':''}</button></div>`
+    : `<div class="pactions">${connectBtn(id,'lg')}<span class="muted" style="font-size:13px;align-self:center">${st==='pending'?`${esc(p.first)} gets one email and can accept or decline.`:st==='declined'?`${esc(p.first)} can’t take intros right now.`:`Contact details unlock after ${esc(p.first)} accepts your intro.`}</span></div>`;
   return `<main><div class="wrap page">
     ${isMe?'':`<button class="back" data-act="back">${I.left}Back</button>`}
     <section class="phead" style="--sc:${SCHOOLS[p.schools[0].school].color}"><div class="phead-band"><span class="band-label"><b>${esc(SCHOOLS[p.schools[0].school].full)}</b><span>${esc(p.schools[0].program)} · CLASS OF ${p.schools[0].year}</span></span><span class="band-mark">${esc(SCHOOLS[p.schools[0].school].tag)} ${yy(p.schools[0].year)}</span></div><div class="phead-body">
@@ -1187,18 +1335,21 @@ function viewProfile(id){
       <div class="phead-info">
         <h1>${esc(p.name)}${isMe?' <span class="tag">YOU</span>':''}</h1>
         <div class="school-line">${badges(p,'lg')}<span class="txt"><b>${p.schools.map(s=>esc(SCHOOLS[s.school].full)).join(', ')}</b><span>${p.schools.map(s=>esc(`${s.program} · ${s.year>NOW_YEAR?'Graduating':'Class of'} ${s.year}`)).join(', ')}</span></span></div>
-        <div class="rl">${esc(p.role)} · <b>${esc(p.company)}</b></div>
+        <div class="rl">${esc(p.role)} · <b>${coName(p)}</b></div>
         <div class="meta"><span>${I.pin}${esc(p.location)}</span><span>${I.layers}${esc(p.industry)}</span><button class="link" data-act="connections" data-id="${id}" data-mode="all">${adj.get(id).size} connections</button></div>
-        <div class="badges">${verifyBadges(p)}<span class="vbadge pref ${p.pref}">${p.pref==='whatsapp'?I.wa:I.mail}${prefLabel}</span></div>
+        <div class="badges">${statusTag(p,'margin:0;vertical-align:0;align-self:center')}${referBadge(p).replace('class="refer"','class="refer" style="font-size:12.5px;padding:4px 10px"')}<span class="vbadge pref ${p.pref}">${p.pref==='whatsapp'?I.wa:I.mail}${prefLabel}</span></div>
       </div>
       ${actions}
       ${how}
     </div></section>
     <div class="pgrid">
       <div class="lcol">
+      <section class="panel"><div class="panel-h"><div><h2>Career history</h2><p class="sub">${isMe?'Your past companies and roles, as members see them':'Past companies and roles, most recent first'}</p></div>${isMe?`<button class="ibtn" data-act="edit" data-kind="exp" aria-label="Add position">${I.add}</button>`:''}</div>${p.career.length?timeline(p,isMe):'<p class="muted" style="margin:0">No positions added yet.</p>'}
+      ${isMe?`<div style="display:flex;gap:18px;margin-top:18px;flex-wrap:wrap"><button class="addlink" data-act="edit" data-kind="exp">${I.add}Add position</button></div>`:''}</section>
+      ${mbaPanel(p,isMe)}
       ${p.about||isMe?`<section class="panel"><div class="panel-h"><div><h2>About</h2>${!p.about?'<p class="sub" style="margin:4px 0 0">Tell members what you’re working on and how they can help.</p>':''}</div>${isMe?`<button class="ibtn" data-act="edit" data-kind="about" aria-label="Edit about">${p.about?I.pencil:I.add}</button>`:''}</div>${p.about?`<p class="about" style="margin-top:10px">${esc(p.about)}</p>`:''}</section>`:''}
-      <section class="panel"><div class="panel-h"><div><h2>Career path</h2><p class="sub">${isMe?'Your journey, as members see it':esc(p.first)+'’s journey, most recent first'}</p></div>${isMe?`<button class="ibtn" data-act="add-section" aria-label="Add position or education">${I.add}</button>`:''}</div>${timeline(p,isMe)}
-      ${isMe?`<div style="display:flex;gap:18px;margin-top:18px;flex-wrap:wrap"><button class="addlink" data-act="edit" data-kind="exp">${I.add}Add position</button><button class="addlink" data-act="edit" data-kind="edu">${I.add}Add education</button></div>`:''}</section>
+      ${israelPanel(p,isMe)}
+      ${topicsPanel(p,isMe)}
       </div>
       <div class="side">
         ${isMe?strengthPanel(p):`<section class="panel"><h2>Why you’d talk</h2><p class="sub">What you have in common</p>
@@ -1210,7 +1361,7 @@ function viewProfile(id){
 }
 function viewNetwork(){
   const conns = [...adj.get(ME)].map(byId);
-  const tabs = [['connections','Connections',conns.length],['requests','Requests',S.incoming.size],['joinreqs','Join requests',S.joinReqs.length],['sent','Sent',S.pending.size]];
+  const tabs = [['connections','Connections',conns.length],['requests','Intro requests',S.incoming.size],['joinreqs','Join requests',S.joinReqs.length],['sent','Sent intros',S.pending.size]];
   let body='';
   if(S.netTab==='connections') body = connBox(ME,'all',true);
   if(S.netTab==='requests') body = S.incoming.size?`<div class="rlist">${[...S.incoming].map(id=>{const p=byId(id);return `<div class="req">${av(p,52)}<button class="who" data-act="profile" data-id="${id}"><b>${esc(p.name)}</b> ${badges(p)}<div class="muted" style="font-size:13.5px">${esc(p.role)} · ${esc(p.company)}</div></button>
@@ -1230,10 +1381,10 @@ function viewNetwork(){
       </div>`; }).join('')}</div>`:`<div class="empty-rail">No one is waiting. You’re all caught up.</div>`);
   }
   if(S.netTab==='sent') body = S.pending.size?`<div class="rlist">${[...S.pending].map(id=>{const p=byId(id);return `<div class="req">${av(p,52)}<button class="who" data-act="profile" data-id="${id}"><b>${esc(p.name)}</b> ${badges(p)}<div class="muted" style="font-size:13.5px">${esc(p.role)} · ${esc(p.company)}</div></button>
-      <span class="btn sm is-pending">${I.clock}Waiting for ${esc(p.first)}</span><button class="btn ghost sm" data-act="withdraw" data-id="${id}">Withdraw</button></div>`}).join('')}</div>`:`<div class="empty-rail">No requests waiting. Find someone on <button class="link" data-act="nav" data-view="home">Discover</button>.</div>`;
+      <span class="btn sm is-pending">${I.clock}Waiting for ${esc(p.first)}</span><button class="btn ghost sm" data-act="preview-email" data-id="${id}">${I.mail}See email</button><button class="btn ghost sm" data-act="withdraw" data-id="${id}">Withdraw</button></div>`}).join('')}</div>`:`<div class="empty-rail">No requests waiting. Find someone on <button class="link" data-act="nav" data-view="home">Discover</button>.</div>`;
   return `<main><div class="wrap page">
     <h1 class="page-h1">My Network</h1>
-    <div class="stats"><div class="stat"><b>${conns.length}</b><span>Connections</span></div><div class="stat"><b>${S.incoming.size}</b><span>Requests to review</span></div><div class="stat"><b>${S.pending.size}</b><span>Waiting on reply</span></div></div>
+    <div class="stats"><div class="stat"><b>${conns.length}</b><span>Connections</span></div><div class="stat"><b>${S.incoming.size}</b><span>Requests to review</span></div><div class="stat"><b>${S.pending.size}</b><span>Waiting on reply</span></div><div class="stat"><b>${S.intros.length}</b><span>Intros sent</span></div></div>
     <div class="tabs" role="tablist">${tabs.map(([k,l,n])=>`<button role="tab" class="${S.netTab===k?'on':''}" data-act="net-tab" data-tab="${k}">${l}${n?`<span class="badge" style="${k==='requests'?'':'background:var(--faint)'}">${n}</span>`:''}</button>`).join('')}</div>
     ${body}
   </div></main>`;
@@ -1246,6 +1397,7 @@ function render(){
   else if(S.view==='results') v=viewResults();
   else if(S.view==='profile') v=viewProfile(S.params.id);
   else if(S.view==='list') v=viewList();
+  else if(S.view==='company') v=viewCompany();
   else if(S.view==='network') v=viewNetwork();
   else if(S.view==='me') v=viewProfile(ME);
   else if(S.view==='connections') v=viewConnections();
@@ -1329,25 +1481,57 @@ function closeModal(){ document.getElementById('modal-root').innerHTML=''; }
 let toastTimer;
 function toast(msg,action){
   const root=document.getElementById('toast-root');
-  root.innerHTML=`<div class="toast" role="status"><span>${msg}</span>${action?`<button data-act="${action.act}" data-id="${action.id}">${action.label}</button>`:''}</div>`;
+  root.innerHTML=`<div class="toast" role="status"><span>${msg}</span>${action?`<button data-act="${action.act}" ${action.id!=null?`data-id="${action.id}"`:''} ${action.co?`data-co="${esc(action.co)}"`:''}>${action.label}</button>`:''}</div>`;
   clearTimeout(toastTimer); toastTimer=setTimeout(()=>root.innerHTML='',action?6500:3200);
 }
 function introText(p){
-  const m=me(); const s=sharedSchool(p); const c=sharedPrev(p);
-  const hook = s?`fellow ${SCHOOLS[s.school].tag}`:c?`also ex-${c}`:'found you on Israeli MBA Network';
-  return `Hi ${p.first}! I’m ${m.first}, MIT Sloan ’27 (ex-PM at Monday.com), ${hook}. I’m exploring ${p.industry.toLowerCase()} roles and would love 15 minutes to hear how you got to ${p.company}.`;
+  const m=me(); const ms=m.schools[0]; const s=sharedSchool(p); const c=sharedPrev(p);
+  const past=m.career.find(x=>!/Present/.test(x.years)); const cur=m.career.find(x=>/Present/.test(x.years));
+  const bg = m.status==='Student' ? (past?` (ex-${past.role} at ${past.company})`:'') : (cur?` (${cur.role} at ${cur.company})`:'');
+  const hook = s?` We’re both ${SCHOOLS[s.school].tag}.`:c?` We both worked at ${c}.`:'';
+  return `Hi ${p.first}! I’m ${m.first}, ${SCHOOLS[ms.school].tag} ${yy(ms.year)}${bg}. I found you through the Israeli MBA Network.${hook} I’m exploring ${p.industry.toLowerCase()} roles and would love 15 minutes to hear how you got to ${p.company}.`;
 }
 function openConnect(id){
   const p=byId(id); const ms=mutuals(id).length;
-  openModal(`<h3>Connect with ${esc(p.first)}</h3><p class="sub">Connections are mutual. Once ${esc(p.first)} accepts, you’ll see each other in My Network.</p>
+  openModal(`<h3>Contact ${esc(p.first)}</h3><p class="sub">${esc(p.first)} gets one email with your note and your profile card, and can accept or decline in one tap. ${esc(p.first)}’s ${p.pref==='whatsapp'?'WhatsApp':'email'} unlocks for you only if they accept.</p>
     <div class="mini">${av(p,46)}<span><b>${esc(p.name)}</b><small>${esc(p.role)} · ${esc(p.company)}${ms?` · ${ms} mutual`:''}</small></span></div>
-    <p class="lbl"><label for="intro-note">Short intro</label><span>Who you are · what you’re asking</span></p>
-    <textarea id="intro-note" maxlength="300">${esc(introText(p))}</textarea>
-    <div class="row"><button class="btn ghost" data-act="close">Cancel</button><button class="btn primary" data-act="send-request" data-id="${id}">${I.plus}Send request</button></div>`);
+    <p class="lbl"><label for="intro-note">Your note</label><span>Who you are · why you’re reaching out</span></p>
+    <textarea id="intro-note" maxlength="500">${esc(introText(p))}</textarea>
+    <p class="err" id="intro-err" hidden style="color:#C2362F;font-size:12.5px;font-weight:600;margin:6px 0 0"></p>
+    <div class="row"><button class="btn ghost" data-act="close">Cancel</button><button class="btn primary" data-act="send-request" data-id="${id}">${I.mail}Send intro</button></div>`);
+}
+function introEmail(id){
+  const p=byId(id), m=me(), r=lastIntro(id); if(!r) return;
+  const used = r.status!=='pending';
+  openModal(`<p class="sub" style="margin:0 0 12px"><b>Demo:</b> this is the one email ${esc(p.first)} gets. Click a button as ${esc(p.first)} would.</p>
+    <div class="email-mock">
+      <div class="eh"><span>From <b>Israeli MBA Network</b></span><span>To <b>${esc(p.first)}</b></span><span>Subject <b>${esc(m.name)}, ${esc(schoolTag(m.schools[0]))}, would like an intro</b></span></div>
+      <div class="eb">
+        <span>Hi ${esc(p.first)}, ${esc(m.first)} found you on Israeli MBA Network and wrote:</span>
+        <p class="note">${esc(r.note)}</p>
+        <div class="mini" style="margin:0">${av(m,46)}<span><b>${esc(m.name)}</b> ${statusTag(m)}<small style="display:block">${esc(m.role)} · ${esc(m.company)} · ${esc(SCHOOLS[m.schools[0].school].full)}, Class of ${m.schools[0].year}</small></span></div>
+        ${used?`<p class="notice" style="margin:0">${I.check}<span>This link was already used. You ${r.status==='accepted'?'accepted':'declined'} this intro.</span></p>`
+          :`<div class="ea"><button class="btn ghost" data-act="intro-decline" data-id="${id}">Decline</button><button class="btn primary" data-act="intro-accept" data-id="${id}">${I.check}Accept</button></div>`}
+        <p class="fine">If you accept, ${esc(m.first)} can reach you on ${p.pref==='whatsapp'?'WhatsApp':'email'}, your preferred channel. If you decline, ${esc(m.first)} sees a polite note and none of your details. Each button works once and expires in 14 days. We won’t send reminders.</p>
+      </div>
+    </div>
+    <div class="row"><button class="btn ghost" data-act="close">Close</button></div>`);
+}
+function respondIntro(id,accept){
+  const r=lastIntro(id); if(!r||r.status!=='pending') { closeModal(); return; }
+  const p=byId(id);
+  r.status=accept?'accepted':'declined'; r.respondedAt=new Date().toISOString();
+  S.pending.delete(id);
+  if(accept){ markConnected(id); logInteraction(id,'Intro accepted · just now'); }
+  closeModal(); softRender(id);
+  if(accept) toast(`${esc(p.first)} accepted your intro`, {act:p.pref==='whatsapp'?'wa':'email', id, label:p.pref==='whatsapp'?'Continue on WhatsApp':'Continue by email'});
+  else toast(`${esc(p.first)} can’t take intros right now. No worries, it happens.`, p.curCompany?{act:'company',co:p.curCompany,label:`More at ${esc(p.curCompany)}`}:null);
 }
 function logInteraction(id,label){ S.interacted=[{id,label},...S.interacted.filter(x=>x.id!==id)].slice(0,12); }
 function openContact(id,ch){
-  const p=byId(id); const msg=introText(p);
+  const p=byId(id);
+  if(!canSeeContact(id)){ toast(`${esc(p.first)}’s contact details unlock after they accept your intro`); return; }
+  const r=lastIntro(id); const msg=r?r.note:introText(p);
   const isWa = ch==='wa';
   openModal(`<div class="handoff" style="color:${isWa?'var(--wa)':'var(--accent)'}"><div class="spin"></div><b style="color:var(--ink)">${isWa?'Opening WhatsApp…':'Opening your email app…'}</b><span class="muted" style="font-size:13.5px">Handing off to ${isWa?'WhatsApp':'your default mail client'}</span></div>`);
   setTimeout(()=>{
@@ -1370,20 +1554,17 @@ function openContact(id,ch){
   },1100);
 }
 function sendRequest(id){
+  const note=(document.getElementById('intro-note')?.value||'').trim();
+  if(note.length<20){ const e=document.getElementById('intro-err'); e.hidden=false; e.textContent='Write a sentence or two: who you are and why you’re reaching out.'; return; }
+  S.intros.push({to:id,note,status:'pending',sentAt:new Date().toISOString(),respondedAt:null});
   S.pending.add(id); closeModal(); softRender(id);
   const p=byId(id);
-  toast(`Request sent to ${esc(p.first)}`);
-  setTimeout(()=>{ // demo: simulate acceptance
-    if(!S.pending.has(id)) return;
-    S.pending.delete(id); markConnected(id); logInteraction(id,'Connected · just now');
-    softRender(id);
-    toast(`${esc(p.first)} accepted your request`, {act:p.pref==='whatsapp'?'wa':'email', id, label:p.pref==='whatsapp'?'Continue on WhatsApp':'Send an email'});
-  },7000);
+  toast(`Intro sent to ${esc(p.first)}`,{act:'preview-email',id,label:`See ${esc(p.first)}’s email`});
 }
 
 /* ---------- profile editing (LinkedIn-style) ---------- */
-const STORE_KEY='imn-my-profile-v1';
-const ME_FIELDS=['first','last','role','location','industry','schools','career','email','phone','pref','photo','about','verify'];
+const STORE_KEY='imn-my-profile-v2';
+const ME_FIELDS=['first','last','role','location','industry','schools','career','email','phone','pref','photo','about','verify','canRefer','unit','ilUni','hometown','topics'];
 const ME_DEFAULT = JSON.parse(JSON.stringify(Object.fromEntries(ME_FIELDS.map(k=>[k,P[ME][k]]))));
 const LOC_OPTIONS=['Boston','New York','SF Bay Area','Seattle','Los Angeles','Chicago','Washington, DC','Austin','Miami'];
 const PROGRAMS=['MBA','EMBA','Sloan Fellows MBA','Part-time MBA','MBA/MS'];
@@ -1394,16 +1575,19 @@ function recompute(p){
   p.career.sort((a,b)=>{const A=ySpan(a.years),B=ySpan(b.years); return (B[1]??9999)-(A[1]??9999)||B[0]-A[0]});
   p.schools.sort((a,b)=>b.year-a.year);
   p.status = p.schools.some(s=>s.year>NOW_YEAR)?'Student':'Alum';
+  splitUnit(p); p.topics=p.topics||[];
+  p.career.forEach(c=>{ c.company=canonCompany(c.company); });
   const cur = p.career.find(c=>/Present/.test(c.years));
   p.curCompany = p.status==='Student'?null:(cur?cur.company:null);
   p.company = p.status==='Student' ? p.schools.find(s=>s.year>NOW_YEAR).school : (cur?cur.company:p.schools[0].school);
   p.prev=[...new Set(p.career.filter(c=>!/Present/.test(c.years)&&!/^IDF/.test(c.company)&&c.company!==p.curCompany).map(c=>c.company))];
+  if(!p.curCompany) p.canRefer=false;
   p.words=[p.name,p.role,p.company,...p.career.map(c=>c.role+' '+c.company)].join(' ').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
 }
 function saveMe(){ try{ localStorage.setItem(STORE_KEY,JSON.stringify(Object.fromEntries(ME_FIELDS.map(k=>[k,me()[k]])))); }catch(_){ } }
 function loadMe(){ try{ const d=JSON.parse(localStorage.getItem(STORE_KEY)||'null'); if(d&&d.schools&&d.schools.length){ Object.assign(me(),d); recompute(me()); } }catch(_){ } }
 function strengthPanel(p){
-  const items=[['photo','Add a profile photo',!!p.photo],['intro','Write a headline that says what you do',!!p.role&&p.role!=='MBA Candidate'],['about','Write an About section',!!(p.about&&p.about.trim())],['exp','Add your experience',p.career.length>0],['contact','Add your WhatsApp number',!!p.phone]];
+  const items=[['photo','Add a profile photo',!!p.photo],['intro','Write a headline that says what you do',!!p.role&&p.role!=='MBA Candidate'],['about','Write an About section',!!(p.about&&p.about.trim())],['exp','Add your experience',p.career.length>0],['contact','Add your WhatsApp number',!!p.phone],['israel','Add your Israeli background',!!(p.ilUni||p.hometown)],['topics','Add topics you’re open to talk about',p.topics.length>0]];
   const done=items.filter(i=>i[2]).length; const lvl=done===items.length?'All-star':done>=3?'Intermediate':'Beginner';
   return `<section class="panel strength"><h2>Profile strength: ${lvl}</h2><p class="sub" style="margin:2px 0 0">Complete profiles get more replies to intros.</p>
     <div class="bar"><i style="width:${done/items.length*100}%"></i></div>
@@ -1442,7 +1626,7 @@ function openEdit(kind,idx){
     const [st,en]=ySpan(c.years);
     html=editShell(isNew?'Add experience':'Edit experience',`<p class="req-note">* Indicates required</p>
       ${fld('e-title','Title*',`<input type="text" id="e-title" value="${esc(c.role)}" placeholder="Ex: Product Manager" maxlength="100">`)}
-      ${fld('e-co','Company*',`<input type="text" id="e-co" value="${esc(c.company)}" placeholder="Ex: Wix" maxlength="100" list="co-list"><datalist id="co-list">${ALL_COMPANIES.map(x=>`<option value="${esc(x)}">`).join('')}</datalist>`)}
+      ${fld('e-co','Company*',`<input type="text" id="e-co" value="${esc(c.company)}" placeholder="Start typing, then pick from the list" maxlength="100" list="co-list"><datalist id="co-list">${ALL_COMPANIES.map(x=>`<option value="${esc(x)}">`).join('')}</datalist>`,'<p class="hint"><span>Pick from the list when you can, so you land on the right company page</span></p>')}
       ${fld('e-cloc','Location',`<input type="text" id="e-cloc" value="${esc(c.location||'')}" placeholder="Ex: Tel Aviv, Israel" maxlength="60">`)}
       <label class="checkrow"><input type="checkbox" id="e-current" ${en==null?'checked':''}>I am currently working in this role</label>
       <div class="two">${fld('e-start','Start year*',`<select id="e-start">${yearOpts(st,NOW_YEAR)}</select>`)}${fld('e-end','End year*',`<select id="e-end" ${en==null?'disabled':''}>${en==null?'<option>Present</option>':''}${yearOpts(en??NOW_YEAR,NOW_YEAR)}</select>`)}</div>`,
@@ -1455,9 +1639,23 @@ function openEdit(kind,idx){
       ${fld('e-school','School*',`<select id="e-school"><option value="">Select your US MBA program</option>${Object.keys(SCHOOLS).map(k=>`<option value="${esc(k)}" ${k===s.school?'selected':''}>${esc(SCHOOLS[k].full)}</option>`).join('')}</select>`)}
       ${fld('e-prog','Program*',`<select id="e-prog">${PROGRAMS.map(x=>`<option ${x===s.program?'selected':''}>${x}</option>`).join('')}</select>`)}
       <div class="two">${fld('e-ystart','Start year*',`<select id="e-ystart">${yearOpts(s.start||s.year-2,NOW_YEAR)}</select>`)}${fld('e-yend','Class year (or expected)*',`<select id="e-yend">${yearOpts(s.year)}</select>`)}</div>
+      ${fld('e-conc','Concentration',`<input type="text" id="e-conc" value="${esc(s.concentration||'')}" placeholder="Ex: Entrepreneurship & Innovation" maxlength="80">`)}
+      ${fld('e-clubs','Clubs',`<input type="text" id="e-clubs" value="${esc((s.clubs||[]).join(', '))}" placeholder="Ex: Israeli Business Club, Product Management Club" maxlength="200">`,'<p class="hint"><span>Separate clubs with commas</span></p>')}
       <div class="notice">${I.shield}<span>Your school and class year are the first thing members see. ${isNew?'A new school is marked verified once you confirm your school email.':'Changing your school sends a new verification link to your school email.'}</span></div>
       ${only?'<p class="req-note">You need at least one US MBA program on your profile, so this entry can’t be deleted.</p>':''}`,
       {saveKind:'edu',idx:isNew?'':idx,del:isNew||only?null:'Delete education'});
+  }
+  if(kind==='israel'){
+    html=editShell('Israeli background',`<p class="req-note">Shown lower on your profile. Everything here is optional.</p>
+      ${fld('e-unit','Unit / service',`<input type="text" id="e-unit" value="${esc(p.unit||'')}" placeholder="Ex: Unit 8200, Navy, National Service" maxlength="80">`,'<p class="hint"><span>Optional. Leave it blank if you’d rather not share.</span></p>')}
+      ${fld('e-iluni','Israeli university',`<input type="text" id="e-iluni" value="${esc(p.ilUni||'')}" placeholder="Ex: Tel Aviv University" maxlength="80" list="iluni-list"><datalist id="iluni-list">${[...new Set(P.map(x=>x.ilUni).filter(Boolean))].sort().map(x=>`<option value="${esc(x)}">`).join('')}</datalist>`)}
+      ${fld('e-home','Hometown',`<input type="text" id="e-home" value="${esc(p.hometown||'')}" placeholder="Ex: Haifa" maxlength="60">`)}`,{saveKind:'israel'});
+  }
+  if(kind==='topics'){
+    const picked=new Set(p.topics); const sugg=[...new Set([...Object.keys(INDUSTRIES),...P.flatMap(x=>x.topics)])].slice(0,24);
+    html=editShell('Open to talking about',`<p class="req-note">Pick the industries and topics members can reach out to you about.</p>
+      <div class="topic-picks">${sugg.map(t=>`<label class="fopt"><input type="checkbox" data-topic value="${esc(t)}" ${picked.has(t)?'checked':''}><span>${esc(t)}</span></label>`).join('')}</div>
+      ${fld('e-topics','Other topics',`<input type="text" id="e-topics" value="${esc(p.topics.filter(t=>!sugg.includes(t)).join(', '))}" placeholder="Ex: Relocating with a partner, PM interviews" maxlength="200">`,'<p class="hint"><span>Separate with commas</span></p>')}`,{saveKind:'topics'});
   }
   if(kind==='photo'){
     photoDraft = p.photo||null;
@@ -1487,15 +1685,17 @@ function saveEdit(kind,idx){
     const cur=document.getElementById('e-current').checked, st=+val('e-start'), en=cur?null:+val('e-end');
     if(!cur && en<st){ fieldErr('e-end','End year can’t be before start year'); ok=false; } else fieldErr('e-end','');
     if(!ok) return;
-    const entry={years:fmtYears(st,en),company:val('e-co'),role:val('e-title'),location:val('e-cloc')};
+    const entry={years:fmtYears(st,en),company:canonCompany(val('e-co')),role:val('e-title'),location:val('e-cloc')};
     if(idx==='') p.career.push(entry); else p.career[+idx]=entry; }
   if(kind==='edu'){
     need('e-school','Select your school');
     const st=+val('e-ystart'), y=+val('e-yend'); if(y<=st){ fieldErr('e-yend','Class year must be after start year'); ok=false; } else fieldErr('e-yend','');
     if(!ok) return;
-    const entry={school:val('e-school'),program:val('e-prog'),year:y,start:st};
+    const entry={school:val('e-school'),program:val('e-prog'),year:y,start:st,concentration:val('e-conc'),clubs:val('e-clubs').split(',').map(x=>x.trim()).filter(Boolean)};
     if(idx==='') p.schools.push(entry); else p.schools[+idx]=entry; }
   if(kind==='photo'){ p.photo=photoDraft||null; }
+  if(kind==='israel'){ Object.assign(p,{unit:val('e-unit'),ilUni:val('e-iluni'),hometown:val('e-home')}); }
+  if(kind==='topics'){ p.topics=[...new Set([...[...document.querySelectorAll('[data-topic]:checked')].map(x=>x.value),...val('e-topics').split(',').map(x=>x.trim()).filter(Boolean)])]; }
   recompute(p); saveMe(); closeModal(); render();
   toast(kind==='photo'?'Photo updated':'Profile updated');
 }
@@ -1511,6 +1711,8 @@ function openAddSection(){
       ${row('about',I.doc,'Add about','What you’re working on and how members can help')}
       ${row('edu',I.cap,'Add education','Your US MBA program and class year')}
       ${row('exp',I.building,'Add position','A current or past role')}
+      ${row('israel',I.shield,'Israeli background','Unit (optional), Israeli university, hometown')}
+      ${row('topics',I.spark,'Open to talking about','Industries and topics members can ask you about')}
       ${row('photo',I.camera,'Add profile photo','Help members recognize you')}
     </div></div></div></div>`;
 }
@@ -1717,10 +1919,16 @@ document.addEventListener('click',e=>{
     case 'scroll': { const tr=document.getElementById('track-'+t.dataset.key); tr.scrollBy({left:+t.dataset.dir*tr.clientWidth*.8,behavior:'smooth'}); break; }
     case 'connect': openConnect(id); break;
     case 'send-request': sendRequest(id); break;
-    case 'pending': toast(`Waiting for ${esc(byId(id).first)} to accept`); break;
+    case 'pending': toast(`Waiting for ${esc(byId(id).first)} to accept`,{act:'preview-email',id,label:'See the email'}); break;
     case 'accept': S.incoming.delete(id); markConnected(id); logInteraction(id,'Connected · just now'); softRender(id); toast(`You and ${esc(byId(id).first)} are now connected`,{act:byId(id).pref==='whatsapp'?'wa':'email',id,label:'Say hello'}); break;
     case 'decline': S.incoming.delete(id); render(); toast('Request ignored'); break;
-    case 'withdraw': S.pending.delete(id); render(); toast('Request withdrawn'); break;
+    case 'withdraw': { S.pending.delete(id); const r=lastIntro(id); if(r&&r.status==='pending'){ r.status='withdrawn'; r.respondedAt=new Date().toISOString(); } render(); toast('Intro withdrawn'); break; }
+    case 'preview-email': introEmail(id); break;
+    case 'intro-accept': respondIntro(id,true); break;
+    case 'intro-decline': respondIntro(id,false); break;
+    case 'declined-info': toast(`${esc(byId(id).first)} can’t take intros right now. Try someone else at ${esc(byId(id).company)}.`); break;
+    case 'company': S.browse=null; go('company',{co:t.dataset.co}); break;
+    case 'toggle-refer': { const m=me(); if(!m.curCompany){ toast('Add a current position first. Referrals are for the company you work at now.'); break; } m.canRefer=!m.canRefer; saveMe(); render(); toast(m.canRefer?`Members will see you can refer at ${esc(m.curCompany)}`:'“Can refer” turned off'); break; }
     case 'email': openContact(id,'email'); break;
     case 'wa': openContact(id,'wa'); break;
     case 'copy': { const txt=t.dataset.text; const done=()=>{t.innerHTML=I.check+'Copied'}; try{ navigator.clipboard.writeText(txt).then(done,()=>{done()}); }catch(_){ done(); } break; }
